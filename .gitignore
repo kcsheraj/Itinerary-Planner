@@ -1,0 +1,18 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+
+# OS files (macOS)
+.DS_Store
+
+# Frontend build artifacts (if using React/Vite or similar)
+frontend/build/
+
+# Backend build artifacts (if using TypeScript or Babel)
+backend/dist/
