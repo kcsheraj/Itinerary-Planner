@@ -1,3 +1,89 @@
+/* Add this to the top of your CSS file */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Improve the main container */
+.app-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Make the header more responsive */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Adjust search bar for better sizing */
+.search-bar {
+  flex: 1;
+  margin: 0 20px;
+  min-width: 200px;
+}
+
+/* Make timeline items better fit laptop screens */
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  position: relative;
+  margin: 30px 0;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.item-bubble {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Add responsive breakpoints */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .item-bubble {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .item-bubble {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+
 /* Main CSS styles for Itinerate app */
 
 :root {
@@ -240,4 +326,6 @@ body {
 .item-title {
   font-size: 18px;
   font-weight: bold;
-  margin
+  margin: 100%;
+
+}

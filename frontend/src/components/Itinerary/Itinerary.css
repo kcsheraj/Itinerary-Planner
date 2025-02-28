@@ -1,0 +1,231 @@
+/* Base styles for full-width layout */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  
+  /* Itinerary styles */
+  :root {
+    --primary-color: #4CAF50;
+    --secondary-color: #F44336;
+    --light-gray: #E0E0E0;
+    --dark-gray: #333333;
+    --white: #FFFFFF;
+    --home-bg: #E8F5E9;
+    --uber-bg: #FFCDD2;
+    --airport-bg: #E3F2FD;
+    --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    --border-radius: 8px;
+  }
+  
+  .app-container {
+    width: 100vw; /* Use viewport width */
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    width: 100%;
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--dark-gray);
+  }
+  
+  .search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+    position: relative;
+    max-width: 500px; /* Prevent excessive stretching */
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--light-gray);
+    border-radius: 20px;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  /* Main content */
+  .main-content {
+    padding: 20px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
+  .plan-header {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;
+  }
+  
+  .plan-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--dark-gray);
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 20px; /* Consistent spacing */
+    margin-bottom: 30px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+  }
+  
+  .action-button {
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--dark-gray);
+  }
+  
+  .share-btn {
+    background-color: var(--primary-color);
+    color: white !important;
+  }
+  
+  /* Timeline */
+  .timeline-section {
+    margin: 30px 0;
+    width: 100%;
+  }
+  
+  .timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .timeline-title, .timeline-date {
+    color: var(--dark-gray);
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 5px;
+  }
+  
+  .timeline-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    width: 100%;
+    max-width: 1200px; /* Prevent excessive stretching on very wide screens */
+    margin: 0 auto; /* Center on screen */
+  }
+  
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .item-bubble {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: var(--dark-gray);
+  }
+  
+  .home-bubble {
+    background-color: var(--home-bg);
+  }
+  
+  .uber-bubble {
+    background-color: var(--uber-bg);
+  }
+  
+  .airport-bubble {
+    background-color: var(--airport-bg);
+  }
+  
+  .item-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  
+  .item-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 5px 0;
+    color: var(--dark-gray);
+  }
+  
+  .cost, .time {
+    margin: 2px 0;
+    color: var(--dark-gray);
+  }
+  
+  .add-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .add-activity-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+  
+    .item-bubble {
+      width: 120px;
+      height: 120px;
+    }
+  }
+  
+  /* Add larger screen breakpoint */
+  @media (min-width: 1400px) {
+    .timeline-container {
+      max-width: 1400px;
+    }
+  }
