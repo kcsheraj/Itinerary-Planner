@@ -1,231 +1,468 @@
 /* Base styles for full-width layout */
 html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-  }
-  
-  /* Itinerary styles */
-  :root {
-    --primary-color: #4CAF50;
-    --secondary-color: #F44336;
-    --light-gray: #E0E0E0;
-    --dark-gray: #333333;
-    --white: #FFFFFF;
-    --home-bg: #E8F5E9;
-    --uber-bg: #FFCDD2;
-    --airport-bg: #E3F2FD;
-    --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    --border-radius: 8px;
-  }
-  
-  .app-container {
-    width: 100vw; /* Use viewport width */
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Header */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background-color: var(--white);
-    box-shadow: var(--shadow);
-    width: 100%;
-    box-sizing: border-box; /* Include padding in width calculation */
-  }
-  
-  .logo-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .logo-text {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--dark-gray);
-  }
-  
-  .search-bar {
-    flex-grow: 1;
-    margin: 0 20px;
-    position: relative;
-    max-width: 500px; /* Prevent excessive stretching */
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid var(--light-gray);
-    border-radius: 20px;
-    font-size: 16px;
-    outline: none;
-  }
-  
-  /* Main content */
-  .main-content {
-    padding: 20px;
-    width: 100%;
-    margin: 0 auto;
-    box-sizing: border-box; /* Include padding in width calculation */
-  }
-  
-  .plan-header {
-    text-align: center;
-    margin-bottom: 30px;
-    width: 100%;
-  }
-  
-  .plan-title {
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: var(--dark-gray);
-  }
-  
-  .action-buttons {
-    display: flex;
-    justify-content: center; /* Center buttons */
-    gap: 20px; /* Consistent spacing */
-    margin-bottom: 30px;
-    flex-wrap: wrap; /* Allow wrapping on small screens */
-  }
-  
-  .action-button {
-    padding: 12px 20px;
-    border-radius: var(--border-radius);
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    color: var(--dark-gray);
-  }
-  
-  .share-btn {
-    background-color: var(--primary-color);
-    color: white !important;
-  }
-  
-  /* Timeline */
-  .timeline-section {
-    margin: 30px 0;
-    width: 100%;
-  }
-  
-  .timeline-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .timeline-title, .timeline-date {
-    color: var(--dark-gray);
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0 5px;
-  }
-  
-  .timeline-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 50px;
-    width: 100%;
-    max-width: 1200px; /* Prevent excessive stretching on very wide screens */
-    margin: 0 auto; /* Center on screen */
-  }
-  
-  .timeline-item {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  display: block; /* Changed from flex to block to prevent top cutoff */
+}
+
+/* Itinerary styles */
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #F44336;
+  --light-gray: #E0E0E0;
+  --dark-gray: #333333;
+  --white: #FFFFFF;
+  --home-bg: #E8F5E9;
+  --uber-bg: #FFCDD2;
+  --airport-bg: #E3F2FD;
+  --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  --border-radius: 8px;
+}
+
+.app-container {
+  width: 100vw; /* Use viewport width */
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Header */
+.header-wrapper {
+  width: 100%;
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  position: relative; /* Ensure it stays visible */
+  z-index: 100; /* Keep navbar above other elements */
+  top: 0; /* Fix to top of viewport */
+  left: 0; /* Align to left edge */
+  right: 0; /* Span full width */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  width: 100%;
+  max-width: 1400px; /* Match larger screen max-width */
+  margin: 0 auto; /* Center the header */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  min-width: 150px; /* Ensure logo has minimum width */
+}
+
+.logo-container img {
+  max-width: 150px;
+  height: auto;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--dark-gray);
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.nav-button {
+  font-size: 16px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background-color: var(--white);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-button:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+.search-bar {
+  flex-grow: 1;
+  margin: 0 20px;
+  position: relative;
+  max-width: 500px; /* Prevent excessive stretching */
+  display: flex;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid var(--light-gray);
+  border-radius: 20px 0 0 20px;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-button {
+  padding: 10px 15px;
+  border: 1px solid var(--light-gray);
+  border-left: none;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 0 20px 20px 0;
+  cursor: pointer;
+}
+
+/* Main content */
+.main-content {
+  padding: 20px;
+  width: 100%;
+  max-width: 1400px; /* Match larger screen max-width */
+  margin: 0 auto;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.plan-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: var(--dark-gray);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: 20px; /* Consistent spacing */
+  margin-bottom: 30px;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.action-button {
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--dark-gray);
+}
+
+.share-btn {
+  background-color: var(--primary-color);
+  color: white !important;
+}
+
+/* Timeline */
+.timeline-section {
+  margin: 30px 0;
+  width: 100%;
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.timeline-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 5px;
+  color: var(--primary-color);
+}
+
+.timeline-header div {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 5px;
+  color: var(--primary-color);
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  width: 100%;
+  max-width: 1200px; /* Prevent excessive stretching on very wide screens */
+  margin: 0 auto; /* Center on screen */
+}
+
+/* Timeline Item Layout */
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+.date-label {
+  background-color: var(--white);
+  padding: 10px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--dark-gray);
+  width: 100px; /* Increased from 85px */
+  text-align: center;
+  margin-right: 20px; /* Increased spacing */
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.date-time {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Increased event bubble size */
+.item-bubble {
+  width: 180px; /* Increased from 160px */
+  height: 180px; /* Increased from 160px */
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px; /* Increased padding */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: var(--dark-gray);
+  box-sizing: border-box;
+}
+
+.home-bubble {
+  background-color: var(--home-bg);
+}
+
+.uber-bubble {
+  background-color: var(--uber-bg);
+}
+
+.airport-bubble {
+  background-color: var(--airport-bg);
+}
+
+.item-icon {
+  font-size: 40px; /* Increased from 36px */
+  margin-bottom: 15px; /* Increased spacing */
+}
+
+.item-title {
+  font-size: 20px; /* Increased from 18px */
+  font-weight: bold;
+  margin: 5px 0;
+  color: var(--dark-gray);
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.cost, .time {
+  margin: 3px 0;
+  color: var(--dark-gray);
+  font-size: 16px; /* Increased from default */
+}
+
+.add-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px; /* Increased from 20px */
+}
+
+.add-activity-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 25px; /* Increased button size */
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px; /* Increased font size */
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .nav-button {
+    font-size: 15px;
+    padding: 8px 12px;
   }
   
   .item-bubble {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 170px;
+    height: 170px;
+  }
+}
+
+@media (max-width: 992px) {
+  .nav-buttons {
+    gap: 6px;
+  }
+  
+  .nav-button {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+  
+  .search-bar {
+    max-width: 300px;
+  }
+  
+  .item-bubble {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 10px;
+    justify-content: center;
+  }
+  
+  .logo-container {
+    margin-bottom: 10px;
+    width: 100%;
     justify-content: center;
     text-align: center;
-    padding: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    color: var(--dark-gray);
   }
   
-  .home-bubble {
-    background-color: var(--home-bg);
+  .search-bar {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin: 10px 0;
   }
   
-  .uber-bubble {
-    background-color: var(--uber-bg);
+  .nav-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 8px; /* Increased from 6px for better spacing */
   }
   
-  .airport-bubble {
-    background-color: var(--airport-bg);
+  .nav-button {
+    margin-bottom: 5px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .item-bubble {
+    width: 140px;
+    height: 140px;
+    padding: 12px;
   }
   
   .item-icon {
-    font-size: 36px;
-    margin-bottom: 10px;
+    font-size: 32px;
   }
   
   .item-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 5px 0;
-    color: var(--dark-gray);
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .timeline-item {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .cost, .time {
-    margin: 2px 0;
-    color: var(--dark-gray);
+  .date-label {
+    margin-right: 0;
+    margin-bottom: 15px;
+    width: 120px; /* Slightly wider on mobile */
   }
   
-  .add-button-container {
+  .item-bubble {
+    width: 160px; /* Keep bubbles larger on mobile */
+    height: 160px;
+  }
+}
+
+/* Add larger screen breakpoint */
+@media (min-width: 1400px) {
+  .timeline-container {
+    max-width: 1400px;
+  }
+}
+
+.cost-summary {
+  position: fixed; /* Fixed position to stay visible when scrolling */
+  bottom: 30px; /* Distance from bottom of viewport */
+  right: 30px; /* Distance from right of viewport */
+  z-index: 900; /* High z-index to stay above other elements */
+  max-width: 300px; /* Limit maximum width */
+  transition: transform 0.3s ease; /* Smooth animation for hover effect */
+}
+
+.cost-summary-content {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow for floating element */
+  padding: 15px 25px;
+  min-width: 200px;
+  text-align: center;
+  border-left: 5px solid var(--primary-color);
+}
+
+.cost-summary-content:hover {
+  transform: translateY(-5px); /* Slight lift on hover */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
+}
+
+.cost-summary-content h3 {
+  margin: 0 0 10px 0;
+  color: var(--dark-gray);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.total-cost-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cost-summary {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cost-summary {
+    left: 20px; /* Position from left on very small screens */
+    right: 20px; /* Position from right on very small screens */
+    max-width: none; /* Allow full width between left and right */
+    bottom: 15px; /* Closer to bottom on small screens */
+  }
+  
+  .cost-summary-content {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
   }
-  
-  .add-activity-btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .action-buttons {
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-    }
-  
-    .item-bubble {
-      width: 120px;
-      height: 120px;
-    }
-  }
-  
-  /* Add larger screen breakpoint */
-  @media (min-width: 1400px) {
-    .timeline-container {
-      max-width: 1400px;
-    }
-  }
+}
