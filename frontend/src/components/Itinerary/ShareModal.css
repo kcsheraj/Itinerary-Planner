@@ -1,0 +1,688 @@
+/* Share Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+  }
+  
+  .share-modal {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    line-height: 1;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    z-index: 2;
+  }
+  
+  .close-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-header {
+    padding: 25px 20px 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .modal-title {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+  
+  /* Project Description Section */
+  .project-description-section {
+    margin-bottom: 25px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .section-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #444;
+  }
+  
+  .edit-description-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  .edit-description-btn:hover {
+    text-decoration: underline;
+  }
+  
+  .project-description {
+    margin: 0;
+    line-height: 1.5;
+    color: #555;
+  }
+  
+  .description-edit-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .description-textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  
+  .save-description-btn {
+    align-self: flex-end;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  /* Privacy Section */
+  .privacy-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .privacy-toggle {
+    display: flex;
+    align-items: center;
+    margin: 15px 0 10px;
+  }
+  
+  .privacy-label {
+    margin-left: 10px;
+    font-weight: 500;
+  }
+  
+  .privacy-description {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* Switch Toggle */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: var(--primary-color);
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+  
+  .slider.round {
+    border-radius: 24px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  
+  /* Share Link Section */
+  .share-link-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .share-link-container {
+    display: flex;
+    margin-top: 10px;
+  }
+  
+  .share-link-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid --primary-color(225, 100%, 42%);
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+    font-size: 14px;
+  }
+  
+  .copy-link-btn {
+    padding: 0 15px;
+    background-color: var(--primary-color);
+    color: rgb(0, 234, 59);
+    border: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+  }
+  
+  /* Collaborators Section */
+  .collaborators-section {
+    margin-bottom: 25px;
+  }
+  
+  .add-collaborator {
+    display: flex;
+    margin: 15px 0;
+    gap: 10px;
+  }
+  
+  .username-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .permission-select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: white;
+    min-width: 120px;
+  }
+  
+  .add-button {
+    padding: 0 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .add-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .collaborators-list {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .collaborator-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+  }
+  
+  .collaborator-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .collaborator-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  
+  .collaborator-username {
+    font-weight: 500;
+  }
+  
+  .collaborator-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .permission-select-small {
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 13px;
+  }
+  
+  .remove-button {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 5px;
+  }
+  
+  .remove-button:hover {
+    text-decoration: underline;
+  }
+  
+  .no-collaborators {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .cancel-button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .save-button {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .share-modal {
+      width: 95%;
+      max-height: 85vh;
+    }
+    
+    .add-collaborator {
+      flex-direction: column;
+    }
+    
+    .collaborator-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .collaborator-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  /* Global text color overrides to ensure no white text */
+
+/* Ensure all text has a visible color */
+.app-container {
+    color: #333;
+  }
+  
+  /* Make sure all buttons have visible text */
+  button {
+    color: #333;
+  }
+  
+  /* Fix any white text in buttons with colored backgrounds */
+  .action-button, 
+  .add-activity-btn, 
+  .search-button, 
+  .edit-button, 
+  .save-button, 
+  .copy-link-btn {
+    color: #fff !important; /* These should still be white for contrast */
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Add text shadow for better visibility */
+  }
+  
+  /* Ensure all modal content has visible text */
+  .modal-content {
+    color: #333;
+  }
+  
+  /* Ensure item bubbles have visible text regardless of background */
+  .item-bubble,
+  .item-bubble .item-title,
+  .item-bubble .cost,
+  .item-bubble .duration,
+  .item-bubble .item-icon {
+    color: #333 !important;
+  }
+  
+  /* Fix any potentially white text in the collaborator avatars */
+  .collaborator-avatar {
+    color: #fff !important; /* Should remain white for contrast */
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); /* Add text shadow for better visibility */
+  }
+  
+  /* Make sure all form inputs have visible text */
+  input, 
+  textarea, 
+  select {
+    color: #333;
+  }
+  
+  /* Ensure link text is visible */
+  a {
+    color: var(--primary-color);
+  }
+  
+  /* Fix text in header nav buttons */
+  .nav-button {
+    color: #333;
+  }
+  .nav-button:hover {
+    color: #fff; /* White text on primary color background is fine */
+  }
+  
+  /* Ensure date label text is visible */
+  .date-label {
+    color: #333;
+  }
+  .date-day {
+    color: var(--primary-color);
+  }
+/* Global text color overrides to ensure no white text, with exceptions for share elements */
+
+/* Ensure all text has a visible color */
+.app-container {
+  color: #333;
+}
+
+/* Make sure all buttons have visible text */
+button {
+  color: #333;
+}
+
+/* Fix any white text in buttons with colored backgrounds */
+.action-button, 
+.add-activity-btn, 
+.search-button, 
+.edit-button, 
+.save-button, 
+.copy-link-btn {
+  color: #fff !important; /* These should still be white for contrast */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Add text shadow for better visibility */
+}
+
+/* Ensure all modal content has visible text */
+.modal-content {
+  color: #333;
+}
+
+/* Ensure item bubbles have visible text regardless of background */
+.item-bubble,
+.item-bubble .item-title,
+.item-bubble .cost,
+.item-bubble .duration,
+.item-bubble .item-icon {
+  color: #333 !important;
+}
+
+/* Fix any potentially white text in the collaborator avatars */
+.collaborator-avatar {
+  color: #fff !important; /* Should remain white for contrast */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); /* Add text shadow for better visibility */
+}
+
+/* Make sure form inputs have visible text, EXCEPT description editor and share link */
+input:not(.share-link-input), 
+textarea:not(.description-textarea), 
+select {
+  color: #333;
+}
+
+/* Ensure link text is visible */
+a {
+  color: var(--primary-color);
+}
+
+/* Fix text in header nav buttons */
+.nav-button {
+  color: #333;
+}
+.nav-button:hover {
+  color: #fff; /* White text on primary color background is fine */
+}
+
+/* Ensure date label text is visible */
+.date-label {
+  color: #333;
+}
+.date-day {
+  color: var(--primary-color);
+}
+/* Global text color overrides with specific adjustments for descriptions and collaborator input */
+
+/* Ensure all text has a visible color */
+.app-container {
+  color: #333;
+}
+
+/* Make sure all buttons have visible text */
+button {
+  color: #333;
+}
+
+/* Fix any white text in buttons with colored backgrounds */
+.action-button, 
+.add-activity-btn, 
+.search-button, 
+.edit-button, 
+.save-button, 
+.copy-link-btn {
+  color: #fff !important; /* These should still be white for contrast */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Add text shadow for better visibility */
+}
+
+/* Ensure all modal content has visible text */
+.modal-content {
+  color: #333;
+}
+
+/* Ensure item bubbles have visible text regardless of background */
+.item-bubble,
+.item-bubble .item-title,
+.item-bubble .cost,
+.item-bubble .duration,
+.item-bubble .item-icon {
+  color: #333 !important;
+}
+
+/* Fix any potentially white text in the collaborator avatars */
+.collaborator-avatar {
+  color: #fff !important; /* Should remain white for contrast */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); /* Add text shadow for better visibility */
+}
+
+/* Make sure form inputs have visible text */
+input:not(.share-link-input):not(.username-input), 
+textarea:not(.description-textarea), 
+select {
+  color: #333;
+}
+
+
+/* Ensure link text is visible */
+a {
+  color: var(--primary-color);
+}
+
+/* Fix text in header nav buttons */
+.nav-button {
+  color: #333;
+}
+.nav-button:hover {
+  color: #fff; /* White text on primary color background is fine */
+}
+
+/* Ensure date label text is visible */
+.date-label {
+  color: #333;
+}
+/* Fix for Jan 1 color and username input */
+
+/* Make date-day color black instead of green */
+.date-day {
+    color: #333 !important; /* Override the previous rule with !important */
+  }
+  
+  /* Special color for the username input text */
+  .username-input {
+    color: var(--primary-color) !important;
+  }
+  
+  /* Ensure the input text is green while typing */
+  input.username-input::placeholder {
+    color: #999; /* Placeholder should be gray */
+  }
+  
+  /* Fix the share link input border */
+  .share-link-input {
+    border: 1px solid #ddd; /* Fix incorrect border color */
+    color: var(--primary-color);
+  }
+  
+  /* Fix the copy button text color */
+  .copy-link-btn {
+    color: white !important; /* Fixed from rgb(0, 234, 59) */
+  }
+
+/* Fix any potential white text in modals */
+.modal-icon {
+  color: #333;
+}
+
+/* Ensure error and notification text is visible */
+.error-text {
+  color: #d32f2f !important;
+}
+.success-text {
+  color: #388e3c !important;
+}
+
+/* Make share modal text visible on all backgrounds */
+.share-modal h2,
+.share-modal h3,
+.share-modal .collaborator-username,
+.share-modal .privacy-label {
+  color: #333;
+}
+
+/* Non-editable project description should be black */
+.project-description {
+  color: #333 !important;
+}
+
+/* Keep the editable description normal */
+.description-textarea {
+  color: initial;
+}
+
+
+/* Make sure cost summary text is visible */
+.cost-summary-content h3 {
+  color: #333;
+}
+.total-cost-value {
+  color: var(--primary-color);
+}
+
+
+/* Special color for the username input */
+.username-input {
+    color: var(--primary-color);
+  }
