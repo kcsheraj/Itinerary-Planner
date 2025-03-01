@@ -86,6 +86,7 @@
 
 /* Main CSS styles for Itinerate app */
 
+/* App-wide CSS variables to include in your main CSS file */
 :root {
   --primary-color: #4CAF50;
   --secondary-color: #F44336;
@@ -97,6 +98,7 @@
   --airport-bg: #E3F2FD;
   --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   --border-radius: 8px;
+  --max-content-width: 1600px;
 }
 
 * {

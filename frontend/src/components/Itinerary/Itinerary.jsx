@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './Itinerary.css';
+import Navbar from "../Navbar/Navbar";
+import EventModal from './EventModal';
+import ShareModal from './ShareModal';
 import { 
   formatCurrency, 
   formatTime, 
@@ -15,6 +18,9 @@ function Itinerary() {
   const [itinerary, setItinerary] = useState(sampleItineraryData);
   const [activities, setActivities] = useState(sampleItineraryData.activities);
   const [totalCost, setTotalCost] = useState(0);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   
   // Calculate total cost whenever activities change
   useEffect(() => {
@@ -58,32 +64,83 @@ function Itinerary() {
     setActivities(updatedActivities);
   };
   
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
+  
+  const handleShareButtonClick = () => {
+    setShowShareModal(true);
+  };
+  
+  const closeEventModal = () => {
+    setShowEventModal(false);
+    setSelectedEvent(null);
+  };
+  
+  const closeShareModal = () => {
+    setShowShareModal(false);
+  };
+  
+  // Format duration display for the timeline item
+  const formatDurationDisplay = (minutes) => {
+    if (!minutes) return "";
+    
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (hours === 0) {
+      return `${remainingMinutes}m`;
+    } else if (remainingMinutes === 0) {
+      return `${hours}h`;
+    } else {
+      return `${hours}h ${remainingMinutes}m`;
+    }
+  };
+  
+  // Sample enhanced activities with more details
+  const enhancedActivities = activities.map(activity => {
+    // Add placeholder data for demonstration purposes
+    return {
+      ...activity,
+      date: "January 1, 2025",
+      duration: activity.duration || (
+        activity.title === "Leave Home" ? 30 : 
+        activity.title === "Uber To Airport" ? 45 : 
+        activity.title === "Arrive At Airport" ? 120 : 
+        60  // Default duration
+      ),
+      address: activity.address || (
+        activity.title === "Leave Home" ? "123 Home Street, Hometown" :
+        activity.title === "Uber To Airport" ? "Route to SFO Airport" : 
+        activity.title === "Arrive At Airport" ? "San Francisco International Airport, CA" : 
+        "Location not specified"
+      ),
+      description: activity.description || (
+        activity.title === "Leave Home" ? "Depart from home with all luggage and travel documents." :
+        activity.title === "Uber To Airport" ? "Uber ride to the airport. Estimated travel time: 45 minutes." : 
+        activity.title === "Arrive At Airport" ? "Arrive at SFO Terminal 2. Check-in at Japan Airlines counter 3 hours before departure." : 
+        "No additional details available."
+      )
+    };
+  });
+  
   return (
     <div className="app-container">
-      <div className="header-wrapper">
-        <header className="header">
-          <div className="logo-container">
-            <img src="/Itinerate.png" alt="Itinerate" className="logo-image" />
-          </div>
-          <div className="search-bar">
-            <input type="text" placeholder="Search Your Plans..." className="search-input" />
-            <button className="search-button">🔍</button>
-          </div>
-          <div className="nav-buttons">
-            <button className="nav-button dashboard-btn">📊 Dashboard</button>
-            <button className="nav-button favorites-btn">⭐ Favorites</button>
-            <button className="nav-button social-btn">🔊 Social</button>
-            <button className="nav-button profile-btn">👤</button>
-          </div>
-        </header>
-      </div>
+      {/* Replace the old header with the Navbar component */}
+      <Navbar />
 
       <main className="main-content">
         <div className="plan-header">
           <h1 className="plan-title">JAPAN 2025</h1>
           <div className="action-buttons">
             <button className="action-button edit-plan-btn">EDIT PLAN</button>
-            <button className="action-button share-btn">Share With Others!</button>
+            <button 
+              className="action-button share-btn"
+              onClick={handleShareButtonClick}
+            >
+              Share With Others!
+            </button>
             <button className="action-button checklist-btn">Checklist</button>
           </div>
         </div>
@@ -103,18 +160,25 @@ function Itinerary() {
           </div>
           
           <div className="timeline-container">
-            {activities.map((activity, index) => (
+            {enhancedActivities.map((activity, index) => (
               <div className="timeline-item" key={index}>
-                <div className="date-label">
+                <div 
+                  className="date-label"
+                  onClick={() => handleEventClick(activity)}
+                >
                   <div className="date-time">
                     {formatTimeDisplay(activity.time || "3:05")}
                   </div>
                   <div className="date-day">Jan 1</div>
                 </div>
-                <div className={`item-bubble ${activity.bubbleClass || "home-bubble"}`} 
-                    style={activity.backgroundColor ? {backgroundColor: activity.backgroundColor} : {}}>
+                <div 
+                  className={`item-bubble ${activity.bubbleClass || "home-bubble"}`} 
+                  style={activity.backgroundColor ? {backgroundColor: activity.backgroundColor} : {}}
+                  onClick={() => handleEventClick(activity)}
+                >
                   <span className="item-icon">{activity.icon}</span>
                   <div className="item-title">{activity.title}</div>
+                  <div className="duration">{formatDurationDisplay(activity.duration)}</div>
                   <div className="cost">
                     {typeof activity.cost === 'number' 
                       ? `$${activity.cost.toFixed(2)}` 
@@ -129,12 +193,27 @@ function Itinerary() {
               title: "New Activity",
               icon: "📍",
               time: "4:30",
+              duration: 60,
               cost: 0,
               backgroundColor: "#E3F2FD"
             })}>+ Add Activity</button>
           </div>
         </div>
       </main>
+      
+      {/* Event Detail Modal */}
+      <EventModal 
+        show={showEventModal} 
+        event={selectedEvent} 
+        onClose={closeEventModal} 
+      />
+      
+      {/* Share Modal */}
+      <ShareModal 
+        show={showShareModal}
+        onClose={closeShareModal}
+        itineraryTitle="JAPAN 2025"
+      />
     </div>
   );
 }
