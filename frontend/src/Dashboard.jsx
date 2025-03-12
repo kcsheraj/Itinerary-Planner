@@ -1,4 +1,5 @@
 import React from "react";
+import "./Dashboard.css"; // Import CSS file for styling
 
 const itineraries = [
   { id: 1, name: "New York 2025", emoji: "🏙️" },
@@ -11,34 +12,29 @@ const itineraries = [
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
+    <div className="dashboard-container">
       {/* Navigation Bar */}
-      <nav className="w-full bg-gray-300 p-4 flex justify-between">
-        <button className="text-lg">🏠</button>
-        <h1 className="text-xl font-bold">Itinerate</h1>
+      <nav className="navbar">
+        <button>🏠</button>
+        <h1>Itinerate</h1>
         <div>
-          <button className="mr-4">Social</button>
-          <button>User123</button>
+          <button className="nav-button">Social</button>
+          <button className="nav-button">User123</button>
         </div>
       </nav>
 
       {/* Dashboard Title & Button */}
-      <div className="mt-6 text-center">
-        <h2 className="text-2xl font-semibold">Dashboard Page</h2>
-        <button className="mt-4 px-4 py-2 bg-gray-400 text-white rounded">
-          New Itinerary +
-        </button>
+      <div className="dashboard-header">
+        <h2>Dashboard Page</h2>
+        <button className="new-itinerary-btn">New Itinerary +</button>
       </div>
 
       {/* Itinerary Cards */}
-      <div className="grid grid-cols-3 gap-6 mt-8">
+      <div className="grid-container">
         {itineraries.map((itinerary) => (
-          <div
-            key={itinerary.id}
-            className="bg-gray-200 w-40 h-40 flex flex-col items-center justify-center text-lg font-semibold rounded-lg shadow-md"
-          >
-            <span className="text-4xl">{itinerary.emoji}</span>
-            <p className="mt-2">{itinerary.name}</p>
+          <div key={itinerary.id} className="itinerary-card">
+            <span className="emoji">{itinerary.emoji}</span>
+            <p>{itinerary.name}</p>
           </div>
         ))}
       </div>
