@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import reactLogo from './assets/react.svg';
+import Dashboard from "./Dashboard"; // Importing the Dashboard component
+import viteLogo from '/vite.svg';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -28,8 +29,12 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+
+      {/* New Dashboard Page Section */}
+      <hr className="my-6" />
+      <Dashboard /> {/* Adding the Dashboard component here */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
