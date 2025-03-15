@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 // Middleware to allow cross-origin requests
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 // Sample route for testing
 app.get("/", (req, res) => {
@@ -115,8 +115,8 @@ mongoose
     console.log(err);
   });
 
-// Get the port from the .env file or default to 5000 if not found
-const PORT = process.env.PORT || 5001;
+// Get the port from the .env file
+const PORT = process.env.PORT;
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running localhost:${PORT}`);

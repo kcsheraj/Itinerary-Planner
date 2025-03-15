@@ -3,6 +3,7 @@ import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { auth, provider } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Add axios import
+import NavbarLogin from "../Navbar/NavbarLogin"; // Import the new Navbar component
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,23 +44,19 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md bg-green-500 p-10 px-12 rounded-lg shadow-lg space-y-6">
-        <div className="flex justify-center">
-          <img
-            alt="Itinerary Logo"
-            src="/Itinerate.png" // Path to your image in the public folder
-            className="h-16 w-auto" // Adjust size as needed
-          />
-        </div>
-        <h2 className="text-center text-2xl font-bold tracking-tight text-gray-900">
-          Sign in to your account
-        </h2>
-
-        <div className="space-y-4">
+    <div className="bg-gradient-to-r from-green-400 to-blue-500 min-h-screen flex flex-col">
+      <NavbarLogin /> {/* Updated Navbar component */}
+      <div className="flex-grow flex items-center justify-center text-white text-center px-4 md:px-8 lg:px-16 xl:px-24">
+        <div className="w-full max-w-4xl">
+          {" "}
+          {/* Adjust the width here */}
+          <h2 className="text-4xl font-bold mb-4">Welcome to Wandr</h2>
+          <p className="text-xl mb-8">
+            Plan, organize, and share your trips with ease and style.
+          </p>
           <button
             onClick={handleGoogleLogin}
-            className="flex w-full justify-center rounded-md bg-green-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="px-8 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 w-full sm:w-auto"
           >
             Sign in with Google
           </button>
