@@ -1,11 +1,23 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { auth } from "../firebaseConfig"; // Your firebase auth setup
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 const ProtectedRoute = ({ children }) => {
-  const user = auth.currentUser;
+  const [user, setUser] = useState(undefined); // Start as undefined to distinguish from null
 
-  // If the user is authenticated, return the children (Dashboard); otherwise, redirect to Login
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (user === undefined) {
+    return <div>Loading...</div>; // Prevent redirect before authentication check is complete
+  }
+
   return user ? children : <Navigate to="/" />;
 };
 

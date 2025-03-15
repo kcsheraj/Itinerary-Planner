@@ -8,10 +8,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user is authenticated after redirect
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigate("/dashboard"); // Redirect to dashboard if user is logged in
+      if (user && window.location.pathname === "/") {
+        navigate("/dashboard", { replace: true }); // Redirect only if on login page
       }
     });
 
@@ -44,9 +43,28 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login with Google</h2>
-      <button onClick={handleGoogleLogin}>Sign in with Google</button>
+    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md bg-green-500 p-10 px-12 rounded-lg shadow-lg space-y-6">
+        <div className="flex justify-center">
+          <img
+            alt="Itinerary Logo"
+            src="/Itinerate.png" // Path to your image in the public folder
+            className="h-16 w-auto" // Adjust size as needed
+          />
+        </div>
+        <h2 className="text-center text-2xl font-bold tracking-tight text-gray-900">
+          Sign in to your account
+        </h2>
+
+        <div className="space-y-4">
+          <button
+            onClick={handleGoogleLogin}
+            className="flex w-full justify-center rounded-md bg-green-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            Sign in with Google
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

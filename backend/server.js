@@ -27,6 +27,8 @@ app.get("/", (req, res) => {
 app.post("/api/add-user", async (req, res) => {
   const { username, email } = req.body;
 
+  console.log(username, email);
+
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
