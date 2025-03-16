@@ -16,3 +16,4 @@ frontend/build/
 
 # Backend build artifacts (if using TypeScript or Babel)
 backend/dist/
+.env
