@@ -31,7 +31,12 @@ function Navbar() {
             📊 Dashboard
           </button>
           <button className="nav-button favorites-btn">⭐ Favorites</button>
-          <button className="nav-button social-btn">🔊 Social</button>
+          <button
+            className="nav-button social-btn"
+            onClick={() => navigate("/social")} // ✅ Added navigation to Social Page
+          >
+            🔊 Social
+          </button>
 
           {/* Profile Button with Dropdown */}
           <div className="relative">
