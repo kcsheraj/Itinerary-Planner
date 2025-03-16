@@ -4,9 +4,11 @@ import { auth, provider } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Add axios import
 import NavbarLogin from "../Navbar/NavbarLogin"; // Import the new Navbar component
+import useUserStore from "../../store/useUserStore"; // Import Zustand store
 
 const Login = () => {
   const navigate = useNavigate();
+  const setUser = useUserStore((state) => state.setUser); // Get setUser function from Zustand
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -37,6 +39,7 @@ const Login = () => {
 
       console.log(response.data); // Handle response from backend if needed
 
+      setUser(user); // Set the logged-in user globally using Zustand
       navigate("/dashboard"); // Redirect to dashboard after successful login
     } catch (error) {
       console.error("Login error:", error.message);
