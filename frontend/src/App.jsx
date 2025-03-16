@@ -1,39 +1,46 @@
-import { useState } from 'react';
-import './App.css';
-import reactLogo from './assets/react.svg';
-import Dashboard from "./Dashboard"; // Importing the Dashboard component
-import viteLogo from '/vite.svg';
+import React from "react";
+import "./App.css";
+import Itinerary from "./components/Itinerary/Itinerary";
+
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import About from "./components/Landing/About";
+import Dashboard from "./components/Landing/Dashboard"; // Protected route
+import Login from "./components/Landing/Login";
+import ProtectedRoute from "./components/ProtectedRoute"; // Protect dashboard
+import Social from "./components/Social/Social";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-
-      {/* New Dashboard Page Section */}
-      <hr className="my-6" />
-      <Dashboard /> {/* Adding the Dashboard component here */}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/about" element={<About />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/social"
+          element={
+            <ProtectedRoute>
+              <Social />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/itinerary"
+          element={
+            <ProtectedRoute>
+              <Itinerary />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

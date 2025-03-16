@@ -1,0 +1,236 @@
+/* Event Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.event-modal {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  line-height: 1;
+  padding: 5px 10px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  z-index: 2;
+}
+
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  padding: 25px 20px 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.modal-icon {
+  font-size: 30px;
+  /* No specific color here - will inherit */
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+  flex-grow: 1;
+}
+
+.modal-content {
+  padding: 20px;
+  color: #333; /* Default text color for all content */
+}
+
+.info-section {
+  margin-bottom: 25px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-weight: bold;
+  width: 100px;
+  flex-shrink: 0;
+  color: #555;
+}
+
+.info-value {
+  flex-grow: 1;
+  color: #333; /* Explicitly set color for values */
+}
+
+.address-section, 
+.description-section {
+  margin-bottom: 25px;
+}
+
+.address-section h3, 
+.description-section h3 {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.address {
+  margin-bottom: 10px;
+  color: #333; /* Explicitly set color for address */
+}
+
+.map-container {
+  border-radius: 8px;
+  overflow: hidden;
+  height: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.description {
+  line-height: 1.5;
+  color: #333; /* Changed from #555 to #333 for better visibility */
+}
+
+.modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-button, 
+.delete-button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.edit-button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #3d8b40;
+}
+
+.delete-button {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #d32f2f;
+}
+
+.delete-button:hover {
+  background-color: #fff5f5;
+  border-color: #ffcbcb;
+}
+
+/* Ensure text in bubbles is visible regardless of background */
+.item-bubble {
+  color: #333 !important; /* Override any inherited colors */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .event-modal {
+    width: 95%;
+    max-height: 80vh;
+  }
+  
+  .modal-header {
+    padding: 15px;
+  }
+  
+  .modal-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  .info-label {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .edit-button, 
+  .delete-button {
+    width: 100%;
+  }
+}
