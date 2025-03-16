@@ -139,7 +139,7 @@ function EventModal({ show, event, onClose }) {
                   width="100%"
                   height="200"
                   frameBorder="0"
-                  src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodeURIComponent(event.address)}`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyB5BUpzdAMMqGwZWvKoieMsAcMEXULd2gs&q=${encodeURIComponent(event.address)}`}
                   allowFullScreen
                 ></iframe>
               </div>
