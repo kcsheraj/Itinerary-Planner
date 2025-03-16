@@ -134,14 +134,14 @@ function EventModal({ show, event, onClose }) {
               <h3>Location</h3>
               <p className="address">{event.address}</p>
               <div className="map-container">
-                <iframe
-                  title="Event Location"
-                  width="100%"
-                  height="200"
-                  frameBorder="0"
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyB5BUpzdAMMqGwZWvKoieMsAcMEXULd2gs&q=${encodeURIComponent(event.address)}`}
-                  allowFullScreen
-                ></iframe>
+              <iframe
+                title="Event Location"
+                width="100%"
+                height="200"
+                frameBorder="0"
+                src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(event.address)}`}
+                allowFullScreen
+              ></iframe>
               </div>
             </div>
           )}
