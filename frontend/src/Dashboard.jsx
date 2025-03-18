@@ -1,40 +1,35 @@
 import React from "react";
-import "./Dashboard.css"; // Import CSS file for styling
+import "../Dashboard.css"; // Keep using your existing styles
 
 const itineraries = [
-  { id: 1, name: "New York 2025", emoji: "🏙️" },
-  { id: 2, name: "Picnic", emoji: "🍇" },
-  { id: 3, name: "Ocean City", emoji: "🏄‍♂️" },
-  { id: 4, name: "Cherry Blossoms", emoji: "🌸" },
-  { id: 5, name: "DC On Friday", emoji: "🥂" },
-  { id: 6, name: "Hawaii", emoji: "🏝️" },
+  { title: "New York 2025", image: "/images/nyc.png" },
+  { title: "Picnic", image: "/images/picnic.png" },
+  { title: "Ocean City", image: "/images/ocean.png" },
+  { title: "Cherry Blossoms", image: "/images/cherry.png" },
+  { title: "DC On Friday", image: "/images/dc.png" },
+  { title: "Hawaii", image: "/images/hawaii.png" },
 ];
 
 const Dashboard = () => {
   return (
     <div className="dashboard-container">
-      {/* Navigation Bar */}
-      <nav className="navbar">
-        <button>🏠</button>
-        <h1>Itinerate</h1>
-        <div>
-          <button className="nav-button">Social</button>
-          <button className="nav-button">User123</button>
-        </div>
-      </nav>
-
-      {/* Dashboard Title & Button */}
-      <div className="dashboard-header">
-        <h2>Dashboard Page</h2>
+      {/* Navbar stays unchanged */}
+      <header className="dashboard-header">
+        <h1>Dashboard</h1>
         <button className="new-itinerary-btn">New Itinerary +</button>
+      </header>
+
+      {/* "Go to Itinerary" button */}
+      <div className="center-btn">
+        <button className="go-itinerary-btn">Go to Itinerary</button>
       </div>
 
-      {/* Itinerary Cards */}
-      <div className="grid-container">
-        {itineraries.map((itinerary) => (
-          <div key={itinerary.id} className="itinerary-card">
-            <span className="emoji">{itinerary.emoji}</span>
-            <p>{itinerary.name}</p>
+      {/* Itinerary Grid */}
+      <div className="itinerary-grid">
+        {itineraries.map((trip, index) => (
+          <div key={index} className="itinerary-card">
+            <img src={trip.image} alt={trip.title} className="itinerary-img" />
+            <h3>{trip.title}</h3>
           </div>
         ))}
       </div>
