@@ -1,32 +1,20 @@
 .dashboard-container {
   padding: 20px;
-  background-color: #d8e9d6;
+  background-color: #d8f3dc;
   min-height: 100vh;
 }
 
+/* Dashboard Title - Dark Green */
 .dashboard-title {
   text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #14532d; /* Darker Green */
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
 }
 
-.center-btn {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.go-itinerary-btn {
-  background-color: #388e3c;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
+/* Itinerary Grid */
 .itinerary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -34,15 +22,30 @@
   padding: 20px;
 }
 
+/* Itinerary Cards */
 .itinerary-card {
   background-color: white;
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
 }
 
+.itinerary-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Emoji Styling */
 .itinerary-emoji {
-  font-size: 3rem;
+  font-size: 4rem;
   margin-bottom: 10px;
+}
+
+/* Updated Text Styling - Black Text for Readability */
+.itinerary-title {
+  color: #222; /* Dark Gray (or use #000 for black) */
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 8px;
 }

@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
+import "../../Dashboard.css"; // Adjust the path if needed
 import Navbar from "../Navbar/Navbar"; // Import the Navbar component
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -9,14 +11,13 @@ const Dashboard = () => {
   };
 
   const itineraries = [
-    { title: "New York 2025", emoji: "🏙️" },
+    { title: "Trip to the big city", emoji: "🏙️" },
     { title: "Picnic", emoji: "🍇" },
-    { title: "Ocean City", emoji: "🏄" },
-    { title: "Cherry Blossoms", emoji: "🌸" },
-    { title: "DC On Friday", emoji: "🥂" },
-    { title: "Hawaii", emoji: "🏝️" },
+    { title: "Beach Trip", emoji: "🏄" },
+    { title: "Walk in the park", emoji: "🌸" },
+    { title: "Happy Hour", emoji: "🥂" },
+    { title: "Beach Trip", emoji: "🏝️" },
   ];
-
 
   return (
     <div className="min-h-screen flex flex-col bg-green-100">
@@ -25,7 +26,7 @@ const Dashboard = () => {
 
       {/* Dashboard Content */}
       <div className="w-full max-w-4xl mt-12 mx-auto text-center px-4 md:px-8 lg:px-16 xl:px-24">
-        <h1 className="text-4xl font-bold mb-6">Dashboard</h1>
+        <h1 className="text-4xl font-bold mb-6 text-green-900">Dashboard</h1>
 
         {/* Go to Itinerary Button */}
         <div className="flex justify-center gap-4 mb-8">
@@ -40,12 +41,9 @@ const Dashboard = () => {
         {/* Itinerary Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {itineraries.map((trip, index) => (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-lg shadow-md text-center transition-transform transform hover:scale-105"
-            >
-              <div className="text-5xl mb-3">{trip.emoji}</div>
-              <h3 className="text-xl font-semibold">{trip.title}</h3>
+            <div key={index} className="itinerary-card">
+              <div className="itinerary-emoji">{trip.emoji}</div>
+              <h3 className="itinerary-title">{trip.title}</h3>
             </div>
           ))}
         </div>
