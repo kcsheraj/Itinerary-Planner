@@ -1,67 +1,58 @@
-/* General Styling */
 .dashboard-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    background-color: #121212;
-    color: white;
-    min-height: 100vh;
-    padding: 20px;
-  }
-  
-  /* Navigation Bar */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px;
-    background: #333;
-    color: white;
-  }
-  
-  .nav-button {
-    margin: 0 5px;
-    padding: 8px 12px;
-    border: none;
-    background: gray;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  /* Dashboard Header */
-  .dashboard-header {
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .new-itinerary-btn {
-    padding: 10px 15px;
-    background-color: blue;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  /* Itinerary Cards */
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-top: 20px;
-  }
-  
-  .itinerary-card {
-    background: #444;
-    padding: 20px;
-    text-align: center;
-    border-radius: 10px;
-    width: 120px;
-  }
-  
-  .emoji {
-    font-size: 40px;
-  }
-  
+  padding: 20px;
+  background-color: #d8e9d6; /* Use the soft green from your new design */
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.new-itinerary-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.center-btn {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.go-itinerary-btn {
+  background-color: #388e3c;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.itinerary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.itinerary-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.itinerary-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
