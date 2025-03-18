@@ -11,10 +11,10 @@ const Dashboard = () => {
   };
 
   const itineraries = [
-    { title: "Trip to the big city", emoji: "🏙️" },
+    { title: "Trip to the Big City", emoji: "🏙️" },
     { title: "Picnic", emoji: "🍇" },
-    { title: "Beach Trip", emoji: "🏄" },
-    { title: "Walk in the park", emoji: "🌸" },
+    { title: "Movie Night", emoji: "🍿" },
+    { title: "Cherry Blossom Festival", emoji: "🌸" },
     { title: "Happy Hour", emoji: "🥂" },
     { title: "Beach Trip", emoji: "🏝️" },
   ];

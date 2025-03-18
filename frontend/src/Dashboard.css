@@ -34,6 +34,7 @@
 
 .itinerary-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Emoji Styling */
@@ -48,4 +49,21 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin-top: 8px;
+}
+
+.go-itinerary-btn {
+  background-color: #2d6a4f; /* Default green */
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out; /* Smooth transition */
+}
+
+.go-itinerary-btn:hover {
+  background-color: #1e7d32; /* Slightly darker green on hover */
+  transform: scale(1.05); /* Slight zoom effect */
 }
