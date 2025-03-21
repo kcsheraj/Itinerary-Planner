@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../../Dashboard.css"; // Adjust the path if needed
 import Navbar from "../Navbar/Navbar"; // Import the Navbar component
-
+import ItineraryIcon from "./ItineraryIcon"; // ✅ Import the new component
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -41,10 +41,7 @@ const Dashboard = () => {
         {/* Itinerary Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {itineraries.map((trip, index) => (
-            <div key={index} className="itinerary-card">
-              <div className="itinerary-emoji">{trip.emoji}</div>
-              <h3 className="itinerary-title">{trip.title}</h3>
-            </div>
+            <ItineraryIcon key={index} emoji={trip.emoji} title={trip.title} />
           ))}
         </div>
       </div>
