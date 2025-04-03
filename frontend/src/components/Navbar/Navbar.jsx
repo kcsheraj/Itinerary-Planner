@@ -21,7 +21,11 @@ function Navbar() {
     <div className="header-wrapper">
       <header className="header">
         <div className="logo-container" onClick={() => navigate("/")}>
-          <img src="/Itinerate.png" alt="Itinerate" className="logo-image" />
+          <img
+            src="/Itinerate-removebg-preview.png"
+            alt="Itinerate"
+            className="logo-image"
+          />
         </div>
         <div className="nav-buttons">
           <button
@@ -30,7 +34,6 @@ function Navbar() {
           >
             📊 Dashboard
           </button>
-          <button className="nav-button favorites-btn">⭐ Favorites</button>
           <button
             className="nav-button social-btn"
             onClick={() => navigate("/social")} // ✅ Added navigation to Social Page
