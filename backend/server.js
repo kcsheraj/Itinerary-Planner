@@ -1,8 +1,8 @@
 // server.js
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -12,6 +12,9 @@ const app = express();
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
+
+console.log("Mongo URI:", process.env.MONGO_URI);
+
 
 // Middleware to allow cross-origin requests
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173", credentials: true }));
