@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import './Itinerary.css';
+import React, { useEffect, useState } from 'react';
 import { checklistService } from '../../services/api';
+import './Itinerary.css';
 
 const defaultCategories = [
   {

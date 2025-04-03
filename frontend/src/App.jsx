@@ -2,10 +2,10 @@ import React from "react";
 import "./App.css";
 import Itinerary from "./components/Itinerary/Itinerary";
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/Landing/Login";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import About from "./components/Landing/About";
 import Dashboard from "./components/Landing/Dashboard"; // Protected route
+import Login from "./components/Landing/Login";
 import ProtectedRoute from "./components/ProtectedRoute"; // Protect dashboard
 import Social from "./components/Social/Social";
 
