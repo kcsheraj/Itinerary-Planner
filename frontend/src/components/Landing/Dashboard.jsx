@@ -1,47 +1,82 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../Dashboard.css"; // Adjust the path if needed
-import Navbar from "../Navbar/Navbar"; // Import the Navbar component
-import ItineraryIcon from "./ItineraryIcon"; // ✅ Import the new component
+import "../../Dashboard.css";
+import Navbar from "../Navbar/Navbar";
+import ItineraryIcon from "./ItineraryIcon";
+import { itineraryService } from "../../services/api"; // ✅ Import API service
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [itineraries, setItineraries] = useState([]);
 
-  const handleItineraryRedirect = () => {
-    navigate("/itinerary"); // Redirect to itinerary page
+  // Fetch itineraries when component mounts
+  useEffect(() => {
+    const fetchItineraries = async () => {
+      try {
+        const data = await itineraryService.getItineraries();
+        setItineraries(data); // ✅ Update state with fetched itineraries
+      } catch (error) {
+        console.error("Error fetching itineraries:", error);
+      }
+    };
+
+    fetchItineraries();
+  }, []);
+
+  const handleNewItinerary = async () => {
+    try {
+      const newItinerary = {
+        title: "New Itinerary",
+        description: "Description of the new itinerary",
+        activities: [],
+      };
+
+      const createdItinerary = await itineraryService.createItinerary(
+        newItinerary
+      );
+
+      // ✅ Add the new itinerary to the state & navigate
+      setItineraries((prev) => [...prev, createdItinerary]);
+      navigate(`/itinerary/${createdItinerary._id}`);
+    } catch (error) {
+      console.error("Error creating itinerary:", error);
+    }
   };
 
-  const itineraries = [
-    { title: "Trip to the Big City", emoji: "🏙️" },
-    { title: "Picnic", emoji: "🍇" },
-    { title: "Movie Night", emoji: "🍿" },
-    { title: "Cherry Blossom Festival", emoji: "🌸" },
-    { title: "Happy Hour", emoji: "🥂" },
-    { title: "Beach Trip", emoji: "🏝️" },
-  ];
+  const handleDelete = async (id) => {
+    try {
+      await itineraryService.deleteItinerary(id);
+      setItineraries(itineraries.filter((trip) => trip._id !== id));
+    } catch (error) {
+      console.error("Error deleting itinerary:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-green-100">
-      {/* Navbar remains at the top */}
       <Navbar />
 
-      {/* Dashboard Content */}
       <div className="w-full max-w-4xl mt-12 mx-auto text-center px-4 md:px-8 lg:px-16 xl:px-24">
         <h1 className="text-4xl font-bold mb-6 text-green-900">Dashboard</h1>
 
-        {/* Go to Itinerary Button */}
         <div className="flex justify-center gap-4 mb-8">
           <button
-            onClick={handleItineraryRedirect}
+            onClick={handleNewItinerary}
             className="px-8 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700"
           >
-            Go to Itinerary
+            New Itinerary
           </button>
         </div>
 
-        {/* Itinerary Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {itineraries.map((trip, index) => (
-            <ItineraryIcon key={index} emoji={trip.emoji} title={trip.title} />
+          {itineraries.map((trip) => (
+            <ItineraryIcon
+              key={trip._id}
+              id={trip._id}
+              initialEmoji={trip.emoji || "📌"} // Default emoji
+              initialTitle={trip.title}
+              onDelete={() => handleDelete(trip._id)}
+            />
           ))}
         </div>
       </div>

@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import EventModal from './EventModal';
-import ShareModal from './ShareModal';
-import ChecklistModal from './ChecklistModal';
-import Navbar from '../Navbar/Navbar';
-import { itineraryService, checklistService } from '../../services/api';
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams } from "react-router-dom"; // Import useParams hoo
+import EventModal from "./EventModal";
+import ShareModal from "./ShareModal";
+import ChecklistModal from "./ChecklistModal";
+import Navbar from "../Navbar/Navbar";
+import { itineraryService, checklistService } from "../../services/api";
 
 const Itinerary = () => {
+  const { id } = useParams(); // Use useParams to get the `id` from the URL
   // State for the itinerary data
   const [itineraryId, setItineraryId] = useState(null);
-  const [itineraryTitle, setItineraryTitle] = useState("JAPAN 2025");
+  const [itineraryTitle, setItineraryTitle] = useState("My Itinerary");
   const [itineraryDescription, setItineraryDescription] = useState(
-    "Trip to Japan starting January 1st, 2025. Includes Tokyo, Kyoto, and Osaka."
+    "Description of the trip"
   );
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -22,7 +24,7 @@ const Itinerary = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Activities state
   const [activities, setActivities] = useState([]);
   const [groupedActivities, setGroupedActivities] = useState({});
@@ -33,85 +35,15 @@ const Itinerary = () => {
     const loadItinerary = async () => {
       try {
         setLoading(true);
-        // Try to load the itineraries
-        const itineraries = await itineraryService.getItineraries();
-        
-        if (itineraries && itineraries.length > 0) {
-          // Use the first itinerary if any exist
-          const itinerary = itineraries[0];
-          setItineraryId(itinerary._id);
-          setItineraryTitle(itinerary.title);
-          setItineraryDescription(itinerary.description || "");
-          setActivities(itinerary.activities || []);
-          console.log("Loaded itinerary:", itinerary);
-        } else {
-          console.log("No itineraries found, creating a new one...");
-          // Create a new itinerary if none exist
-          const defaultActivities = [
-            {
-              id: "act1",
-              title: "Leave Home",
-              icon: "🏠",
-              time: "15:05",
-              duration: 30,
-              cost: 0,
-              date: "January 1, 2025",
-              backgroundColor: "#E8F5E9",
-              bubbleClass: "home-bubble",
-              address: "123 Home Street, Hometown",
-              description: "Depart from home with all luggage and travel documents."
-            },
-            {
-              id: "act2",
-              title: "Uber To Airport",
-              icon: "🚕",
-              time: "15:15",
-              duration: 45,
-              cost: 30,
-              date: "January 1, 2025",
-              backgroundColor: "#FFEBEE",
-              bubbleClass: "uber-bubble",
-              address: "Route to SFO Airport",
-              description: "Uber ride to the airport. Estimated travel time: 45 minutes."
-            },
-            {
-              id: "act3",
-              title: "Arrive At Airport",
-              icon: "🏢",
-              time: "16:00",
-              duration: 120,
-              cost: 0,
-              date: "January 1, 2025",
-              backgroundColor: "#E3F2FD",
-              bubbleClass: "airport-bubble",
-              address: "San Francisco International Airport, CA",
-              description: "Arrive at SFO Terminal 2. Check-in at Japan Airlines counter 3 hours before departure."
-            },
-            {
-              id: "act4",
-              title: "Flight to Tokyo",
-              icon: "✈️",
-              time: "19:30",
-              duration: 720,
-              cost: 850,
-              date: "January 1, 2025",
-              backgroundColor: "#E3F2FD",
-              bubbleClass: "airport-bubble",
-              address: "SFO International Airport, Terminal 2",
-              description: "Japan Airlines Flight JL7075. 12-hour flight to Tokyo Narita Airport."
-            }
-          ];
-          
-          const newItinerary = await itineraryService.createItinerary({
-            title: itineraryTitle,
-            description: itineraryDescription,
-            activities: defaultActivities
-          });
-          
-          console.log("Created new itinerary:", newItinerary);
-          setItineraryId(newItinerary._id);
-          setActivities(defaultActivities);
-        }
+
+        // Use the first itinerary if any exist
+        const itinerary = await itineraryService.getItinerary(id);
+        setItineraryId(itinerary._id);
+        setItineraryTitle(itinerary.title);
+        setItineraryDescription(itinerary.description || "");
+        setActivities(itinerary.activities || []);
+        console.log("Loaded itinerary:", itinerary);
+
         setLoading(false);
       } catch (err) {
         console.error("Error loading itinerary:", err);
@@ -119,19 +51,19 @@ const Itinerary = () => {
         setLoading(false);
       }
     };
-    
+
     loadItinerary();
   }, []);
-  
+
   // Save changes to title and description
   useEffect(() => {
     const saveItineraryDetails = async () => {
       if (!itineraryId || loading) return; // Skip if we don't have an ID yet or still loading
-      
+
       try {
         await itineraryService.updateItinerary(itineraryId, {
           title: itineraryTitle,
-          description: itineraryDescription
+          description: itineraryDescription,
         });
         console.log("Saved itinerary details");
       } catch (err) {
@@ -139,23 +71,23 @@ const Itinerary = () => {
         setError("Failed to save changes to title/description");
       }
     };
-    
+
     // Use a debounce to avoid too many API calls
     const timeoutId = setTimeout(() => {
       saveItineraryDetails();
     }, 1000);
-    
+
     return () => clearTimeout(timeoutId);
   }, [itineraryId, itineraryTitle, itineraryDescription, loading]);
-  
+
   // Save activities whenever they change
   useEffect(() => {
     const saveActivities = async () => {
       if (!itineraryId || loading) return; // Skip if we don't have an ID yet or still loading
-      
+
       try {
         await itineraryService.updateItinerary(itineraryId, {
-          activities: activities
+          activities: activities,
         });
         console.log("Saved activities");
       } catch (err) {
@@ -163,28 +95,28 @@ const Itinerary = () => {
         setError("Failed to save changes to activities");
       }
     };
-    
+
     // Use a debounce to avoid too many API calls
     const timeoutId = setTimeout(() => {
       saveActivities();
     }, 1000);
-    
+
     return () => clearTimeout(timeoutId);
   }, [itineraryId, activities, loading]);
 
   // Parse and format dates for consistent comparison
   const formatDateForGrouping = useCallback((dateStr) => {
     if (!dateStr) return "Unknown Date";
-    
+
     try {
       // Try to parse the date
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
         // Return a consistent format for grouping
-        return date.toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric'
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
       }
       return dateStr; // If parsing fails, use the original string
@@ -196,21 +128,21 @@ const Itinerary = () => {
   // Helper function to convert time to minutes for sorting
   const timeToMinutes = useCallback((timeStr) => {
     if (!timeStr) return 0;
-    
+
     let hours, minutes;
-    
-    if (timeStr.includes('AM') || timeStr.includes('PM')) {
+
+    if (timeStr.includes("AM") || timeStr.includes("PM")) {
       // Handle 12-hour format
-      const [timePart, period] = timeStr.split(' ');
-      [hours, minutes] = timePart.split(':').map(Number);
-      
-      if (period === 'PM' && hours !== 12) hours += 12;
-      if (period === 'AM' && hours === 12) hours = 0;
+      const [timePart, period] = timeStr.split(" ");
+      [hours, minutes] = timePart.split(":").map(Number);
+
+      if (period === "PM" && hours !== 12) hours += 12;
+      if (period === "AM" && hours === 12) hours = 0;
     } else {
       // Handle 24-hour format
-      [hours, minutes] = timeStr.split(':').map(Number);
+      [hours, minutes] = timeStr.split(":").map(Number);
     }
-    
+
     return hours * 60 + (minutes || 0);
   }, []);
 
@@ -218,19 +150,21 @@ const Itinerary = () => {
   useEffect(() => {
     // Group by date
     const groups = {};
-    activities.forEach(activity => {
+    activities.forEach((activity) => {
       const dateKey = formatDateForGrouping(activity.date);
       if (!groups[dateKey]) {
         groups[dateKey] = [];
       }
       groups[dateKey].push(activity);
     });
-    
+
     // Sort activities within each date group by time
-    Object.keys(groups).forEach(date => {
-      groups[date].sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+    Object.keys(groups).forEach((date) => {
+      groups[date].sort(
+        (a, b) => timeToMinutes(a.time) - timeToMinutes(b.time)
+      );
     });
-    
+
     // Sort dates chronologically
     const sortedDates = Object.keys(groups).sort((a, b) => {
       try {
@@ -239,7 +173,7 @@ const Itinerary = () => {
         return 0; // If date parsing fails, keep original order
       }
     });
-    
+
     setGroupedActivities(groups);
     setActiveDates(sortedDates);
   }, [activities, formatDateForGrouping, timeToMinutes]);
@@ -247,17 +181,21 @@ const Itinerary = () => {
   // Calculate total cost whenever activities change
   useEffect(() => {
     const total = activities.reduce((sum, activity) => {
-      const cost = typeof activity.cost === 'number' ? activity.cost : 
-                  (typeof activity.cost === 'string' ? parseFloat(activity.cost.replace('$', '')) || 0 : 0);
+      const cost =
+        typeof activity.cost === "number"
+          ? activity.cost
+          : typeof activity.cost === "string"
+          ? parseFloat(activity.cost.replace("$", "")) || 0
+          : 0;
       return sum + cost;
     }, 0);
-    
+
     setTotalCost(total);
   }, [activities]);
 
   // Event handlers
   const handleActivityClick = (activity) => {
-    setSelectedEvent({...activity});
+    setSelectedEvent({ ...activity });
     setEditMode(false);
     setShowEventModal(true);
   };
@@ -270,52 +208,58 @@ const Itinerary = () => {
       time: "12:00",
       duration: 60,
       cost: 0,
-      date: new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric'
+      date: new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }),
       backgroundColor: "#E3F2FD",
       bubbleClass: "airport-bubble",
       address: "Location to be specified",
-      description: "Description to be added"
+      description: "Description to be added",
     };
-    
+
     setActivities([...activities, newActivity]);
-    setSelectedEvent({...newActivity});
+    setSelectedEvent({ ...newActivity });
     setEditMode(true);
     setShowEventModal(true);
   };
 
   const handleEditActivity = (activity, e) => {
     e.stopPropagation();
-    setSelectedEvent({...activity}); // Create a copy to avoid reference issues
+    setSelectedEvent({ ...activity }); // Create a copy to avoid reference issues
     setEditMode(true);
     setShowEventModal(true);
   };
 
   const handleUpdateActivity = (updatedActivity) => {
     // First, check if the date or time has changed
-    const originalActivity = activities.find(a => a.id === updatedActivity.id);
+    const originalActivity = activities.find(
+      (a) => a.id === updatedActivity.id
+    );
     const hasDateChanged = originalActivity.date !== updatedActivity.date;
     const hasTimeChanged = originalActivity.time !== updatedActivity.time;
-    
+
     // Update the activity in the list
-    const updatedActivities = activities.map(activity => 
+    const updatedActivities = activities.map((activity) =>
       activity.id === updatedActivity.id ? updatedActivity : activity
     );
-    
+
     setActivities(updatedActivities);
     setShowEventModal(false);
-    
+
     // If we need to check the result of the update
     if (hasDateChanged || hasTimeChanged) {
-      console.log(`Activity updated: Date changed: ${hasDateChanged}, Time changed: ${hasTimeChanged}`);
+      console.log(
+        `Activity updated: Date changed: ${hasDateChanged}, Time changed: ${hasTimeChanged}`
+      );
     }
   };
 
   const handleDeleteActivity = (activityId) => {
-    const updatedActivities = activities.filter(activity => activity.id !== activityId);
+    const updatedActivities = activities.filter(
+      (activity) => activity.id !== activityId
+    );
     setActivities(updatedActivities);
     setShowEventModal(false);
   };
@@ -325,7 +269,7 @@ const Itinerary = () => {
   };
 
   const handleTitleSave = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       setIsEditingTitle(false);
     }
   };
@@ -352,27 +296,27 @@ const Itinerary = () => {
 
   // Format time display (12-hour format)
   const formatTimeDisplay = (timeStr) => {
-    if (!timeStr) return '12:00 PM';
-    
+    if (!timeStr) return "12:00 PM";
+
     // If it's already in 12-hour format with AM/PM, return as is
-    if (timeStr.includes('AM') || timeStr.includes('PM')) {
+    if (timeStr.includes("AM") || timeStr.includes("PM")) {
       return timeStr;
     }
-    
+
     // Handle 24-hour format
-    const timeParts = timeStr.split(':');
+    const timeParts = timeStr.split(":");
     if (timeParts.length === 2) {
       let hours = parseInt(timeParts[0], 10);
       const minutes = timeParts[1];
-      const period = hours >= 12 ? 'PM' : 'AM';
-      
+      const period = hours >= 12 ? "PM" : "AM";
+
       // Convert to 12-hour format
       hours = hours % 12;
       hours = hours ? hours : 12; // Convert 0 to 12
-      
+
       return `${hours}:${minutes} ${period}`;
     }
-    
+
     // If format is unexpected, return as is
     return timeStr;
   };
@@ -380,10 +324,10 @@ const Itinerary = () => {
   // Format duration display
   const formatDurationDisplay = (minutes) => {
     if (!minutes) return "";
-    
+
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    
+
     if (hours === 0) {
       return `${remainingMinutes}m`;
     } else if (remainingMinutes === 0) {
@@ -396,16 +340,19 @@ const Itinerary = () => {
   // Format date display for the day label
   const formatDateDay = (dateStr) => {
     if (!dateStr) return "Jan 1";
-    
+
     try {
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        });
       }
       // If it's already in "Month Day" format, try to parse it
-      const parts = dateStr.split(' ');
+      const parts = dateStr.split(" ");
       if (parts.length >= 2) {
-        return `${parts[0].substring(0, 3)} ${parts[1].replace(',', '')}`;
+        return `${parts[0].substring(0, 3)} ${parts[1].replace(",", "")}`;
       }
       return "Jan 1"; // Default fallback
     } catch (e) {
@@ -435,7 +382,7 @@ const Itinerary = () => {
         <div className="main-content">
           <div className="error-container">
             <p>{error}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="action-button share-btn"
             >
@@ -449,7 +396,7 @@ const Itinerary = () => {
 
   return (
     <div className="app-container">
-      <Navbar/>
+      <Navbar />
       <div className="main-content">
         {/* Header with editable title */}
         <div className="plan-header">
@@ -469,15 +416,15 @@ const Itinerary = () => {
               <span className="edit-icon-small">✏️</span>
             </h1>
           )}
-          
+
           <div className="action-buttons">
-            <button 
+            <button
               className="action-button share-btn"
               onClick={() => setShowShareModal(true)}
             >
               Share
             </button>
-            <button 
+            <button
               className="action-button checklist-btn"
               onClick={() => setShowChecklistModal(true)}
             >
@@ -485,7 +432,7 @@ const Itinerary = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Itinerary Description */}
         <div className="itinerary-description-container">
           {isEditingDescription ? (
@@ -498,7 +445,10 @@ const Itinerary = () => {
               autoFocus
             />
           ) : (
-            <p className="itinerary-description" onClick={handleDescriptionClick}>
+            <p
+              className="itinerary-description"
+              onClick={handleDescriptionClick}
+            >
               {itineraryDescription}
               <span className="edit-icon-small">✏️</span>
             </p>
@@ -521,14 +471,14 @@ const Itinerary = () => {
               {activeDates.length > 0 ? formatDateDay(activeDates[0]) : "Jan 1"}
             </div>
           </div>
-          
+
           <div className="timeline-container">
-            {activeDates.map(dateKey => (
+            {activeDates.map((dateKey) => (
               <div key={dateKey} className="date-group">
                 <div className="date-divider">
                   <div className="date-label-text">{dateKey}</div>
                 </div>
-                
+
                 {groupedActivities[dateKey].map((activity, activityIndex) => (
                   <div className="timeline-item compact-view" key={activity.id}>
                     <div className="timeline-left">
@@ -536,35 +486,46 @@ const Itinerary = () => {
                         <div className="date-time">
                           {formatTimeDisplay(activity.time)}
                         </div>
-                        <div className="date-day">{formatDateDay(activity.date)}</div>
+                        <div className="date-day">
+                          {formatDateDay(activity.date)}
+                        </div>
                       </div>
-                      <div 
+                      <div
                         className={`item-bubble ${activity.bubbleClass}`}
                         onClick={() => handleActivityClick(activity)}
                       >
                         <span className="item-icon">{activity.icon}</span>
                         <div className="item-title">{activity.title}</div>
-                        <div className="duration">{formatDurationDisplay(activity.duration)}</div>
-                        <div className="cost">
-                          ${typeof activity.cost === 'number' ? activity.cost.toFixed(2) : '0.00'}
+                        <div className="duration">
+                          {formatDurationDisplay(activity.duration)}
                         </div>
-                        <div 
-                          className="edit-icon" 
+                        <div className="cost">
+                          $
+                          {typeof activity.cost === "number"
+                            ? activity.cost.toFixed(2)
+                            : "0.00"}
+                        </div>
+                        <div
+                          className="edit-icon"
                           onClick={(e) => handleEditActivity(activity, e)}
                         >
                           ✏️
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Description on the right side */}
                     <div className="timeline-right">
                       <div className="event-description-container">
                         {activity.address && (
-                          <div className="event-address">{activity.address}</div>
+                          <div className="event-address">
+                            {activity.address}
+                          </div>
                         )}
                         {activity.description && (
-                          <div className="event-description">{activity.description}</div>
+                          <div className="event-description">
+                            {activity.description}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -573,7 +534,7 @@ const Itinerary = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="add-button-container">
             <button className="add-activity-btn" onClick={handleAddActivity}>
               Add Activity
@@ -581,22 +542,22 @@ const Itinerary = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Event Modal */}
       {showEventModal && selectedEvent && (
-        <EventModal 
-          show={showEventModal} 
-          event={selectedEvent} 
+        <EventModal
+          show={showEventModal}
+          event={selectedEvent}
           onClose={() => setShowEventModal(false)}
           isEditMode={editMode}
           onUpdate={handleUpdateActivity}
           onDelete={handleDeleteActivity}
         />
       )}
-      
+
       {/* Share Modal */}
       {/* Share Modal */}
-      <ShareModal 
+      <ShareModal
         show={showShareModal}
         onClose={() => setShowShareModal(false)}
         itineraryTitle={itineraryTitle}
@@ -615,5 +576,3 @@ const Itinerary = () => {
 };
 
 export default Itinerary;
-
-
