@@ -401,22 +401,22 @@ app.get("/api/health", (req, res) => {
 
 // Connect to MongoDB
 mongoose
-.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  family: 4 // 👈 Forces IPv4, fixes weird Windows/DNS issues
-})
+  .connect(process.env.MONGO_URI, {
+    family: 4 // Forces IPv4 to avoid weird DNS issues on Windows
+  })
   .then(() => {
-    console.log("Connected to MongoDB Atlas");
-    
-    // Start the server after successful DB connection
+    console.log("✅ Connected to MongoDB Atlas");
+
     const PORT = process.env.PORT || 5001;
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("MongoDB connection error:", err);
+    console.error("❌ MongoDB connection error:");
+    console.error(err.message); // only show the useful message
+    console.error("🧠 Make sure your IP is whitelisted in MongoDB Atlas");
   });
+
 
 export default app;
