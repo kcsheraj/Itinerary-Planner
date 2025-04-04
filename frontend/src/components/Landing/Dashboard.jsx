@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Dashboard.css";
+import CreateItineraryModal from "../Itinerary/CreateItineraryModal";
+import EditItineraryModal from "../Itinerary/EditItineraryModal";
 import Navbar from "../Navbar/Navbar";
-import CreateItineraryModal from "./CreateItineraryModal";
-import EditItineraryModal from "./EditItineraryModal";
+
 import ItineraryIcon from "./ItineraryIcon";
 
 const Dashboard = () => {

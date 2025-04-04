@@ -401,7 +401,11 @@ app.get("/api/health", (req, res) => {
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  family: 4 // 👈 Forces IPv4, fixes weird Windows/DNS issues
+})
   .then(() => {
     console.log("Connected to MongoDB Atlas");
     
