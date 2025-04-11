@@ -21,7 +21,7 @@ app.use(
   })
 );
 
-// Itinerary Schema
+// ===== Itinerary SCHEMAS =====
 const ActivitySchema = new mongoose.Schema({
   id: { type: String, required: true },
   title: { type: String, required: true },
@@ -60,7 +60,7 @@ const ItinerarySchema = new mongoose.Schema({
   },
 });
 
-// Checklist Schema
+// ===== Checklist SCHEMAS =====
 const ChecklistItemSchema = new mongoose.Schema({
   id: { type: String, required: true },
   text: { type: String, required: true },
@@ -90,42 +90,7 @@ const ChecklistSchema = new mongoose.Schema({
   },
 });
 
-// Define models
-const Itinerary = mongoose.model("Itinerary", ItinerarySchema);
-const Checklist = mongoose.model("Checklist", ChecklistSchema);
-
-// ===== Itinerary Routes =====
-
-// Get all itineraries
-app.get("/api/itineraries", async (req, res) => {
-  try {
-    const itineraries = await Itinerary.find();
-    res.json(itineraries);
-  } catch (error) {
-    console.error("Error fetching itineraries:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Get a specific itinerary by ID
-app.get("/api/itineraries/:id", async (req, res) => {
-  try {
-    const itinerary = await Itinerary.findById(req.params.id);
-
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
-
-    res.json(itinerary);
-  } catch (error) {
-    console.error("Error fetching itinerary:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Add to your server.js file
-
-// ShareSettings Schema
+// ===== ShareSettings SCHEMAS =====
 const ShareSettingsSchema = new mongoose.Schema({
   itineraryId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -161,61 +126,36 @@ const ShareSettingsSchema = new mongoose.Schema({
   },
 });
 
+// ===== DEFINE MODELS =====
+const Itinerary = mongoose.model("Itinerary", ItinerarySchema);
+const Checklist = mongoose.model("Checklist", ChecklistSchema);
 const ShareSettings = mongoose.model("ShareSettings", ShareSettingsSchema);
 
-// Add share settings routes
-app.get("/api/sharesettings/:itineraryId", async (req, res) => {
+// ===== Itinerary Routes =====
+
+// Get all itineraries
+app.get("/api/itineraries", async (req, res) => {
   try {
-    const settings = await ShareSettings.findOne({
-      itineraryId: req.params.itineraryId,
-    });
-
-    if (!settings) {
-      return res.json({
-        itineraryId: req.params.itineraryId,
-        isPublic: false,
-        description: "",
-        collaborators: [],
-      });
-    }
-
-    res.json(settings);
+    const itineraries = await Itinerary.find();
+    res.json(itineraries);
   } catch (error) {
-    console.error("Error fetching share settings:", error);
+    console.error("Error fetching itineraries:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-app.post("/api/sharesettings/:itineraryId", async (req, res) => {
+// Get a specific itinerary by ID
+app.get("/api/itineraries/:id", async (req, res) => {
   try {
-    const { isPublic, description, collaborators } = req.body;
+    const itinerary = await Itinerary.findById(req.params.id);
 
-    // Check if settings exist
-    let settings = await ShareSettings.findOne({
-      itineraryId: req.params.itineraryId,
-    });
-
-    if (settings) {
-      // Update existing settings
-      settings.isPublic = isPublic;
-      settings.description = description;
-      settings.collaborators = collaborators;
-      settings.updatedAt = Date.now();
-      await settings.save();
-    } else {
-      // Create new settings
-      settings = new ShareSettings({
-        itineraryId: req.params.itineraryId,
-        isPublic,
-        description,
-        collaborators,
-      });
-      await settings.save();
+    if (!itinerary) {
+      return res.status(404).json({ error: "Itinerary not found" });
     }
 
-    res.json(settings);
+    res.json(itinerary);
   } catch (error) {
-    console.error("Error saving share settings:", error);
+    console.error("Error fetching itinerary:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -324,6 +264,65 @@ app.delete("/api/itineraries/:id", async (req, res) => {
     res.json({ message: "Itinerary deleted successfully" });
   } catch (error) {
     console.error("Error deleting itinerary:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ===== ShareSettings Routes =====
+
+// Add share settings routes
+app.get("/api/sharesettings/:itineraryId", async (req, res) => {
+  try {
+    const settings = await ShareSettings.findOne({
+      itineraryId: req.params.itineraryId,
+    });
+
+    if (!settings) {
+      return res.json({
+        itineraryId: req.params.itineraryId,
+        isPublic: false,
+        description: "",
+        collaborators: [],
+      });
+    }
+
+    res.json(settings);
+  } catch (error) {
+    console.error("Error fetching share settings:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/api/sharesettings/:itineraryId", async (req, res) => {
+  try {
+    const { isPublic, description, collaborators } = req.body;
+
+    // Check if settings exist
+    let settings = await ShareSettings.findOne({
+      itineraryId: req.params.itineraryId,
+    });
+
+    if (settings) {
+      // Update existing settings
+      settings.isPublic = isPublic;
+      settings.description = description;
+      settings.collaborators = collaborators;
+      settings.updatedAt = Date.now();
+      await settings.save();
+    } else {
+      // Create new settings
+      settings = new ShareSettings({
+        itineraryId: req.params.itineraryId,
+        isPublic,
+        description,
+        collaborators,
+      });
+      await settings.save();
+    }
+
+    res.json(settings);
+  } catch (error) {
+    console.error("Error saving share settings:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
