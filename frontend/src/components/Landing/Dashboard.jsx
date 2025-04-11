@@ -34,7 +34,7 @@ const Dashboard = () => {
         title: "New Itinerary",
         description: "Description of the new itinerary",
         activities: [],
-        creator: { username: creatorUsername }, // Store the creator's username
+        creatorUsername: user.email, // Store the creator's username
       };
 
       const createdItinerary = await itineraryService.createItinerary(
