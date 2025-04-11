@@ -43,15 +43,11 @@ const ItinerarySchema = new mongoose.Schema({
     type: String,
     default: ""
   },
-  activities: [ActivitySchema],
-  createdAt: {
-    type: Date,
-    default: Date.now
+  emoji: {
+    type: String,
+    default: "📍"
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  activities: [ActivitySchema],
 });
 
 // Checklist Schema
@@ -217,14 +213,15 @@ app.post("/api/sharesettings/:itineraryId", async (req, res) => {
 // Create a new itinerary
 app.post("/api/itineraries", async (req, res) => {
   try {
-    const { title, description, activities } = req.body;
-    
+    const { title, description, emoji, activities } = req.body;
+
     const newItinerary = new Itinerary({
       title,
       description,
+      emoji,
       activities: activities || []
     });
-    
+
     const savedItinerary = await newItinerary.save();
     res.status(201).json(savedItinerary);
   } catch (error) {
@@ -232,6 +229,9 @@ app.post("/api/itineraries", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 
 // Update an existing itinerary
 app.put("/api/itineraries/:id", async (req, res) => {
