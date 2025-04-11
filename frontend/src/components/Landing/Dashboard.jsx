@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Dashboard.css";
+import { fetchItineraries } from "../../services/itineraryService";
 import CreateItineraryModal from "../Itinerary/CreateItineraryModal";
 import EditItineraryModal from "../Itinerary/EditItineraryModal";
 import Navbar from "../Navbar/Navbar";
-
 import ItineraryIcon from "./ItineraryIcon";
 
 const Dashboard = () => {
@@ -15,14 +15,17 @@ const Dashboard = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItinerary, setSelectedItinerary] = useState(null);
 
-  const [itineraries, setItineraries] = useState([
-    { title: "Trip to the Big City", emoji: "🏙️", slug: "big-city" },
-    { title: "Picnic", emoji: "🍇", slug: "picnic" },
-    { title: "Movie Night", emoji: "🍿", slug: "movie-night" },
-    { title: "Cherry Blossom Festival", emoji: "🌸", slug: "cherry-blossom" },
-    { title: "Happy Hour", emoji: "🥂", slug: "happy-hour" },
-    { title: "Beach Trip", emoji: "🏝️", slug: "beach-trip" },
-  ]);
+  const [itineraries, setItineraries] = useState([]);
+  const [filteredItineraries, setFilteredItineraries] = useState([]);
+
+  useEffect(() => {
+    fetchItineraries()
+      .then((data) => {
+        setItineraries(data);
+        setFilteredItineraries(data);
+      })
+      .catch((err) => console.error("Failed to load itineraries", err));
+  }, []);
 
   const handleCreate = () => setShowCreateModal(true);
 
@@ -31,12 +34,18 @@ const Dashboard = () => {
     setShowEditModal(true);
   };
 
-  const filteredItineraries = itineraries.filter((trip) =>
-    trip.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const handleItineraryClick = (slug) => {
-    navigate(`/aakash/${slug}`); // Update this for dynamic username later
+    navigate(`/aakash/${slug}`); // Replace "aakash" with dynamic user later
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    const lower = value.toLowerCase();
+    const filtered = itineraries.filter((trip) =>
+      trip.title.toLowerCase().includes(lower)
+    );
+    setFilteredItineraries(filtered);
   };
 
   return (
@@ -52,7 +61,8 @@ const Dashboard = () => {
             type="text"
             placeholder="Search itineraries..."
             className="px-4 py-2 rounded-md shadow border border-gray-300 w-full sm:w-1/2"
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchTerm}
+            onChange={handleSearch}
           />
 
           <button
@@ -65,10 +75,10 @@ const Dashboard = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {filteredItineraries.map((trip, index) => (
+          {filteredItineraries.map((trip) => (
             <ItineraryIcon
-              key={index}
-              emoji={trip.emoji}
+              key={trip._id}
+              emoji={trip.emoji || "📍"}
               title={trip.title}
               onClick={() => handleItineraryClick(trip.slug)}
               onEdit={() => handleEdit(trip)}
@@ -88,7 +98,10 @@ const Dashboard = () => {
       {showEditModal && selectedItinerary && (
         <EditItineraryModal
           itinerary={selectedItinerary}
-          onClose={() => setShowEditModal(false)}
+          onClose={() => {
+            setSelectedItinerary(null);
+            setShowEditModal(false);
+          }}
           setItineraries={setItineraries}
         />
       )}
