@@ -6,17 +6,39 @@ const [emoji, setEmoji] = useState("");
 const [slug, setSlug] = useState("");
 const [error, setError] = useState("");
 
-const handleCreate = () => {
-    const slugExists = itineraries.some((i) => i.slug === slug);
-    if (slugExists) {
+const handleCreate = async () => {
+  const slugExists = itineraries.some((i) => i.slug === slug);
+  if (slugExists) {
     setError("Itinerary name is already taken. Try another.");
     return;
-    }
+  }
 
-    const newItinerary = { title, emoji, slug };
-    setItineraries([...itineraries, newItinerary]);
-    onClose();
+  const newItinerary = {
+    title,
+    emoji,
+    description: "",
+    activities: [],
+    slug,
   };
+
+  try {
+    const res = await fetch("http://localhost:5001/api/itineraries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newItinerary),
+    });
+
+    if (!res.ok) throw new Error("Failed to create itinerary");
+
+    const saved = await res.json();
+    setItineraries([...itineraries, saved]);
+    onClose();
+  } catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
