@@ -16,7 +16,7 @@ const ItineraryIcon = ({ emoji, title, onClick, onEdit }) => {
         ✏️
       </button>
 
-      <div className="text-4xl mb-2">{emoji}</div>
+      <div className="text-4xl mb-2">{emoji || "📍"}</div>
       <div className="font-medium text-green-800">{title}</div>
     </div>
   );

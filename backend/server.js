@@ -35,19 +35,12 @@ const ActivitySchema = new mongoose.Schema({
 });
 
 const ItinerarySchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    default: ""
-  },
-  emoji: {
-    type: String,
-    default: "📍"
-  },
+  title: { type: String, required: true },
+  emoji: { type: String, default: "📍" }, // ✅ Add this line
+  description: { type: String, default: "" },
   activities: [ActivitySchema],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 // Checklist Schema

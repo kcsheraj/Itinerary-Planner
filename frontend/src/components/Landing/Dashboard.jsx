@@ -21,6 +21,7 @@ const Dashboard = () => {
   useEffect(() => {
     fetchItineraries()
       .then((data) => {
+        console.log("Fetched from backend:", data); // 🔍 Add this line
         setItineraries(data);
         setFilteredItineraries(data);
       })
@@ -78,7 +79,7 @@ const Dashboard = () => {
           {filteredItineraries.map((trip) => (
             <ItineraryIcon
               key={trip._id}
-              emoji={trip.emoji || "📍"}
+              emoji={trip.emoji}
               title={trip.title}
               onClick={() => handleItineraryClick(trip.slug)}
               onEdit={() => handleEdit(trip)}

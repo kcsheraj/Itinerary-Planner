@@ -31,7 +31,7 @@ const handleCreate = async () => {
     if (!res.ok) throw new Error("Failed to create itinerary");
 
     const saved = await res.json();
-    setItineraries([...itineraries, saved]);
+    setItineraries([...itineraries, savedItinerary]);
     onClose();
   } catch (err) {
     console.error(err);
