@@ -29,18 +29,19 @@ const Social = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="w-full max-w-4xl mt-12 mx-auto text-center text-white px-4 md:px-8 lg:px-16 xl:px-24">
+      <div
+        className="w-full max-w-4xl mt-12 mx-auto text-center px-4 md:px-8 lg:px-16 xl:px-24"
+        style={{ color: "#14532d" }}
+      >
         <h1 className="text-4xl font-bold mb-4">Social Page</h1>
-        <p className="text-lg">
-          Welcome to the Social Page! More features coming soon.
-        </p>
+        <p className="text-lg">Welcome to the Social Page!</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6">
           {itineraries.map((trip) => (
             <ItineraryIcon
               key={trip._id}
               id={trip._id}
-              initialEmoji={trip.emoji || "📌"} // Default emoji
+              initialEmoji={trip.emoji || "🗺️"} // Default emoji
               initialTitle={trip.title}
               onDelete={() => handleDelete(trip._id)}
             />
