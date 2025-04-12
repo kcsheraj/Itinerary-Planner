@@ -306,20 +306,23 @@ app.post("/api/sharesettings/:itineraryId", async (req, res) => {
     });
 
     if (settings) {
-      // Update existing settings
+      const existing = settings.collaborators || [];
+      const incoming = collaborators || [];
+
+      // Merge collaborators by username (avoiding duplicates)
+      const mergedCollaborators = [
+        ...existing,
+        ...incoming.filter(
+          (newCol) =>
+            !existing.some((oldCol) => oldCol.username === newCol.username)
+        ),
+      ];
+
       settings.isPublic = isPublic;
       settings.description = description;
-      settings.collaborators = collaborators;
+      settings.collaborators = mergedCollaborators;
       settings.updatedAt = Date.now();
-      await settings.save();
-    } else {
-      // Create new settings
-      settings = new ShareSettings({
-        itineraryId: req.params.itineraryId,
-        isPublic,
-        description,
-        collaborators,
-      });
+
       await settings.save();
     }
 
