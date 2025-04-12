@@ -58,6 +58,10 @@ const ItinerarySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  imageUrl: {
+    type: String,
+    default: "",
+  },
 });
 
 // ===== Checklist SCHEMAS =====
@@ -223,7 +227,7 @@ app.post("/api/itineraries", async (req, res) => {
 // Update an existing itinerary
 app.put("/api/itineraries/:id", async (req, res) => {
   try {
-    const { title, description, activities } = req.body;
+    const { title, description, activities, imageUrl } = req.body;
 
     // Check if the itinerary exists
     const itinerary = await Itinerary.findById(req.params.id);
@@ -236,6 +240,7 @@ app.put("/api/itineraries/:id", async (req, res) => {
     itinerary.title = title || itinerary.title;
     itinerary.description = description || itinerary.description;
     itinerary.activities = activities || itinerary.activities;
+    itinerary.imageUrl = imageUrl || itinerary.imageUrl;
     itinerary.updatedAt = Date.now();
 
     const updatedItinerary = await itinerary.save();

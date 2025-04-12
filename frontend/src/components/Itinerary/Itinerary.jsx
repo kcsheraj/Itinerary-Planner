@@ -30,6 +30,9 @@ const Itinerary = () => {
   const [groupedActivities, setGroupedActivities] = useState({});
   const [activeDates, setActiveDates] = useState([]);
 
+  const [imageUrl, setImageUrl] = useState("");
+  const [isEditingImageUrl, setIsEditingImageUrl] = useState(false);
+
   // Load or create itinerary on component mount
   useEffect(() => {
     const loadItinerary = async () => {
@@ -43,6 +46,8 @@ const Itinerary = () => {
         setItineraryDescription(itinerary.description || "");
         setActivities(itinerary.activities || []);
         console.log("Loaded itinerary:", itinerary);
+
+        setImageUrl(itinerary.imageUrl || "");
 
         setLoading(false);
       } catch (err) {
@@ -192,6 +197,27 @@ const Itinerary = () => {
 
     setTotalCost(total);
   }, [activities]);
+
+  useEffect(() => {
+    const saveItineraryDetails = async () => {
+      if (!itineraryId || loading) return;
+
+      try {
+        await itineraryService.updateItinerary(itineraryId, {
+          title: itineraryTitle,
+          description: itineraryDescription,
+          imageUrl: imageUrl,
+        });
+        console.log("Saved itinerary details");
+      } catch (err) {
+        console.error("Error saving itinerary details:", err);
+        setError("Failed to save changes to title/description/image");
+      }
+    };
+
+    const timeoutId = setTimeout(saveItineraryDetails, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [itineraryId, itineraryTitle, itineraryDescription, imageUrl, loading]);
 
   // Event handlers
   const handleActivityClick = (activity) => {
@@ -452,6 +478,69 @@ const Itinerary = () => {
               {itineraryDescription}
               <span className="edit-icon-small">✏️</span>
             </p>
+          )}
+        </div>
+
+        {/* Image URL */}
+        <div style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}>
+          {isEditingImageUrl ? (
+            <div style={{ position: "relative" }}>
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                onBlur={() => setIsEditingImageUrl(false)}
+                placeholder="Paste an image URL (e.g. https://...)"
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #ccc",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+                  fontSize: "1rem",
+                }}
+                autoFocus
+              />
+            </div>
+          ) : (
+            <div
+              onClick={() => setIsEditingImageUrl(true)}
+              style={{
+                position: "relative",
+                borderRadius: "0.75rem",
+                overflow: "hidden",
+                border: imageUrl ? "none" : "2px dashed #ccc",
+                cursor: "pointer",
+                backgroundColor: imageUrl ? "transparent" : "#fafafa",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "200px",
+                transition: "all 0.3s ease",
+              }}
+            >
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="Itinerary Cover"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: "300px",
+                    objectFit: "cover",
+                    transition: "transform 0.3s ease",
+                  }}
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+              ) : (
+                <div style={{ textAlign: "center", color: "#999" }}>
+                  <p style={{ marginBottom: "0.5rem", fontSize: "1rem" }}>
+                    Click to add an image URL
+                  </p>
+                  <span style={{ fontSize: "1.5rem" }}>🖼️</span>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
