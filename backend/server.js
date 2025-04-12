@@ -330,6 +330,36 @@ app.post("/api/sharesettings/:itineraryId", async (req, res) => {
   }
 });
 
+// Get all publicly shared itineraries
+app.get("/api/public/itineraries", async (req, res) => {
+  try {
+    // 1. Find all ShareSettings that are public
+    const publicSettings = await ShareSettings.find({ isPublic: true });
+
+    // 2. Extract itinerary IDs
+    const itineraryIds = publicSettings.map((setting) => setting.itineraryId);
+
+    // 3. Fetch those itineraries
+    const itineraries = await Itinerary.find({ _id: { $in: itineraryIds } });
+
+    // Optionally: combine each itinerary with its description from ShareSettings
+    const enrichedItineraries = itineraries.map((itinerary) => {
+      const matchingSetting = publicSettings.find(
+        (setting) => setting.itineraryId.toString() === itinerary._id.toString()
+      );
+      return {
+        ...itinerary.toObject(),
+        shareDescription: matchingSetting?.description || "",
+      };
+    });
+
+    res.json(enrichedItineraries);
+  } catch (error) {
+    console.error("Error fetching public itineraries:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // ===== Checklist Routes =====
 
 // Get a checklist for a specific itinerary

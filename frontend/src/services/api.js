@@ -100,6 +100,16 @@ export const itineraryService = {
     }
   },
 
+  // Get public itineraries
+  getPublicItineraries: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/public/itineraries`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   // Get a specific itinerary by ID (own itinerary)
   getItinerary: async (itineraryId) => {
     try {

@@ -16,7 +16,7 @@ const Social = () => {
       try {
         if (!user || !user.email) return;
 
-        const data = await itineraryService.getUserItineraries(user.email);
+        const data = await itineraryService.getPublicItineraries();
         setItineraries(data);
       } catch (error) {
         console.error("Error fetching itineraries:", error);
