@@ -50,6 +50,11 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this itinerary?"
+    );
+    if (!confirmed) return;
+
     try {
       await itineraryService.deleteItinerary(id);
       setItineraries(itineraries.filter((trip) => trip._id !== id));

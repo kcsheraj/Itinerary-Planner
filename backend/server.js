@@ -258,6 +258,9 @@ app.delete("/api/itineraries/:id", async (req, res) => {
     // Also delete associated checklist
     await Checklist.deleteMany({ itineraryId: req.params.id });
 
+    // ✅ Also delete associated share settings
+    await ShareSettings.deleteMany({ itineraryId: req.params.id });
+
     // Delete the itinerary
     await Itinerary.deleteOne({ _id: req.params.id });
 
