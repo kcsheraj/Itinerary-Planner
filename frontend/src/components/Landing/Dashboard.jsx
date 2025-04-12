@@ -1,27 +1,32 @@
+//Dashboard.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Dashboard.css";
 import Navbar from "../Navbar/Navbar";
 import ItineraryIcon from "./ItineraryIcon";
 import { itineraryService } from "../../services/api"; // ✅ Import API service
+import useUserStore from "../../store/useUserStore"; // Import Zustand store
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [itineraries, setItineraries] = useState([]);
+  const user = useUserStore((state) => state.user);
 
   // Fetch itineraries when component mounts
   useEffect(() => {
     const fetchItineraries = async () => {
       try {
-        const data = await itineraryService.getItineraries();
-        setItineraries(data); // ✅ Update state with fetched itineraries
+        if (!user || !user.email) return;
+
+        const data = await itineraryService.getUserItineraries(user.email);
+        setItineraries(data);
       } catch (error) {
         console.error("Error fetching itineraries:", error);
       }
     };
 
     fetchItineraries();
-  }, []);
+  }, [user]);
 
   const handleNewItinerary = async () => {
     try {
@@ -29,6 +34,7 @@ const Dashboard = () => {
         title: "New Itinerary",
         description: "Description of the new itinerary",
         activities: [],
+        creatorUsername: user.email, // Store the creator's username
       };
 
       const createdItinerary = await itineraryService.createItinerary(
@@ -44,6 +50,11 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this itinerary?"
+    );
+    if (!confirmed) return;
+
     try {
       await itineraryService.deleteItinerary(id);
       setItineraries(itineraries.filter((trip) => trip._id !== id));

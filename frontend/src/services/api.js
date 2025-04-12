@@ -1,14 +1,14 @@
 // services/api.js
 
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
 // Setup axios with Firebase token interceptor
 const setupAxiosInterceptors = () => {
   axios.interceptors.request.use(
     (config) => {
-      const firebaseToken = localStorage.getItem('firebaseToken');
+      const firebaseToken = localStorage.getItem("firebaseToken");
       if (firebaseToken) {
         config.headers.Authorization = `Bearer ${firebaseToken}`;
       }
@@ -32,17 +32,19 @@ export const userService = {
       throw error.response?.data || error;
     }
   },
-  
+
   // Search for users by username or email (for adding collaborators)
   searchUsers: async (query) => {
     try {
-      const response = await axios.get(`${API_URL}/users/search`, { params: { query } });
+      const response = await axios.get(`${API_URL}/users/search`, {
+        params: { query },
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Get user profile by username
   getUserProfile: async (username) => {
     try {
@@ -52,7 +54,7 @@ export const userService = {
       throw error.response?.data || error;
     }
   },
-  
+
   // Update current user's profile
   updateProfile: async (profileData) => {
     try {
@@ -62,7 +64,7 @@ export const userService = {
       throw error.response?.data || error;
     }
   },
-  
+
   // Get collaborations (itineraries shared with current user)
   getCollaborations: async () => {
     try {
@@ -71,7 +73,7 @@ export const userService = {
     } catch (error) {
       throw error.response?.data || error;
     }
-  }
+  },
 };
 
 // Itinerary service
@@ -85,17 +87,19 @@ export const itineraryService = {
       throw error.response?.data || error;
     }
   },
-  
+
   // Get itineraries for a specific user (includes collaboration access)
   getUserItineraries: async (username) => {
     try {
-      const response = await axios.get(`${API_URL}/user/${username}/itineraries`);
+      const response = await axios.get(
+        `${API_URL}/user/${username}/itineraries`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Get a specific itinerary by ID (own itinerary)
   getItinerary: async (itineraryId) => {
     try {
@@ -105,46 +109,56 @@ export const itineraryService = {
       throw error.response?.data || error;
     }
   },
-  
+
   // Get a specific shared itinerary by username and itinerary ID
   getSharedItinerary: async (username, itineraryId) => {
     try {
-      const response = await axios.get(`${API_URL}/user/${username}/itineraries/${itineraryId}`);
+      const response = await axios.get(
+        `${API_URL}/user/${username}/itineraries/${itineraryId}`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Create a new itinerary
   createItinerary: async (itineraryData) => {
     try {
-      const response = await axios.post(`${API_URL}/itineraries`, itineraryData);
+      const response = await axios.post(
+        `${API_URL}/itineraries`,
+        itineraryData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Update an existing itinerary
   updateItinerary: async (itineraryId, itineraryData) => {
     try {
-      const response = await axios.put(`${API_URL}/itineraries/${itineraryId}`, itineraryData);
+      const response = await axios.put(
+        `${API_URL}/itineraries/${itineraryId}`,
+        itineraryData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Delete an itinerary
   deleteItinerary: async (itineraryId) => {
     try {
-      const response = await axios.delete(`${API_URL}/itineraries/${itineraryId}`);
+      const response = await axios.delete(
+        `${API_URL}/itineraries/${itineraryId}`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
-  }
+  },
 };
 
 // Checklist service
@@ -158,26 +172,32 @@ export const checklistService = {
       throw error.response?.data || error;
     }
   },
-  
+
   // Save checklist for an itinerary
   saveChecklist: async (itineraryId, checklistData) => {
     try {
-      const response = await axios.post(`${API_URL}/checklists/${itineraryId}`, checklistData);
+      const response = await axios.post(
+        `${API_URL}/checklists/${itineraryId}`,
+        checklistData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Update a single item in a checklist
   updateChecklistItem: async (itineraryId, itemData) => {
     try {
-      const response = await axios.patch(`${API_URL}/checklists/${itineraryId}/item`, itemData);
+      const response = await axios.patch(
+        `${API_URL}/checklists/${itineraryId}/item`,
+        itemData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
-  }
+  },
 };
 
 // Share service
@@ -185,20 +205,25 @@ export const shareService = {
   // Get share settings for an itinerary
   getShareSettings: async (itineraryId) => {
     try {
-      const response = await axios.get(`${API_URL}/sharesettings/${itineraryId}`);
+      const response = await axios.get(
+        `${API_URL}/sharesettings/${itineraryId}`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-  
+
   // Save share settings for an itinerary
   saveShareSettings: async (itineraryId, settingsData) => {
     try {
-      const response = await axios.post(`${API_URL}/sharesettings/${itineraryId}`, settingsData);
+      const response = await axios.post(
+        `${API_URL}/sharesettings/${itineraryId}`,
+        settingsData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
-  }
+  },
 };

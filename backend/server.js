@@ -14,9 +14,14 @@ const app = express();
 app.use(express.json());
 
 // Middleware to allow cross-origin requests
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-// Itinerary Schema
+// ===== Itinerary SCHEMAS =====
 const ActivitySchema = new mongoose.Schema({
   id: { type: String, required: true },
   title: { type: String, required: true },
@@ -28,62 +33,103 @@ const ActivitySchema = new mongoose.Schema({
   backgroundColor: { type: String, default: "#E3F2FD" },
   bubbleClass: { type: String, default: "airport-bubble" },
   address: String,
-  description: String
+  description: String,
 });
 
 const ItinerarySchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   description: {
     type: String,
-    default: ""
+    default: "",
   },
   activities: [ActivitySchema],
+  creator: {
+    username: { type: String, required: true }, // Store the creator's username
+    email: { type: String },
+  },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-// Checklist Schema
+// ===== Checklist SCHEMAS =====
 const ChecklistItemSchema = new mongoose.Schema({
   id: { type: String, required: true },
   text: { type: String, required: true },
-  completed: { type: Boolean, default: false }
+  completed: { type: Boolean, default: false },
 });
 
 const ChecklistCategorySchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
-  items: [ChecklistItemSchema]
+  items: [ChecklistItemSchema],
 });
 
 const ChecklistSchema = new mongoose.Schema({
   itineraryId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Itinerary',
-    required: true
+    ref: "Itinerary",
+    required: true,
   },
   categories: [ChecklistCategorySchema],
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-// Define models
+// ===== ShareSettings SCHEMAS =====
+const ShareSettingsSchema = new mongoose.Schema({
+  itineraryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Itinerary",
+    required: true,
+  },
+  isPublic: {
+    type: Boolean,
+    default: false,
+  },
+  description: {
+    type: String,
+    default: "",
+  },
+  collaborators: [
+    {
+      username: String,
+      email: String,
+      permission: {
+        type: String,
+        enum: ["read", "write", "admin"],
+        default: "read",
+      },
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// ===== DEFINE MODELS =====
 const Itinerary = mongoose.model("Itinerary", ItinerarySchema);
 const Checklist = mongoose.model("Checklist", ChecklistSchema);
+const ShareSettings = mongoose.model("ShareSettings", ShareSettingsSchema);
 
 // ===== Itinerary Routes =====
 
@@ -102,11 +148,11 @@ app.get("/api/itineraries", async (req, res) => {
 app.get("/api/itineraries/:id", async (req, res) => {
   try {
     const itinerary = await Itinerary.findById(req.params.id);
-    
+
     if (!itinerary) {
       return res.status(404).json({ error: "Itinerary not found" });
     }
-    
+
     res.json(itinerary);
   } catch (error) {
     console.error("Error fetching itinerary:", error);
@@ -114,62 +160,135 @@ app.get("/api/itineraries/:id", async (req, res) => {
   }
 });
 
-// Add to your server.js file
+// Get itineraries where user is a collaborator
+app.get("/api/user/:username/itineraries", async (req, res) => {
+  try {
+    const { username } = req.params;
 
-// ShareSettings Schema
-const ShareSettingsSchema = new mongoose.Schema({
-  itineraryId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Itinerary',
-    required: true
-  },
-  isPublic: {
-    type: Boolean,
-    default: false
-  },
-  description: {
-    type: String,
-    default: ""
-  },
-  collaborators: [
-    {
-      username: String,
-      email: String,
-      permission: {
-        type: String,
-        enum: ['read', 'write', 'admin'],
-        default: 'read'
-      }
-    }
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+    // Find all share settings where user is a collaborator
+    const settings = await ShareSettings.find({
+      "collaborators.username": username,
+    });
+
+    const itineraryIds = settings.map((s) => s.itineraryId);
+
+    // Find itineraries that match those IDs
+    const itineraries = await Itinerary.find({
+      _id: { $in: itineraryIds },
+    });
+
+    res.json(itineraries);
+  } catch (error) {
+    console.error("Error fetching user itineraries:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-const ShareSettings = mongoose.model("ShareSettings", ShareSettingsSchema);
+// Create a new itinerary
+app.post("/api/itineraries", async (req, res) => {
+  try {
+    const { title, description, activities, creatorUsername } = req.body; // Include the creatorUsername in the request body
+
+    // Create the new itinerary
+    const newItinerary = new Itinerary({
+      title,
+      description,
+      activities: activities || [],
+      creator: { username: creatorUsername }, // Store the creator's username
+    });
+
+    const savedItinerary = await newItinerary.save();
+
+    // Create default ShareSettings with the user as the initial collaborator
+    const newShareSettings = new ShareSettings({
+      itineraryId: savedItinerary._id,
+      isPublic: false, // Default is private
+      collaborators: [
+        {
+          username: creatorUsername, // The user who created the itinerary
+          permission: "admin", // Give the creator "admin" permission by default
+        },
+      ],
+    });
+
+    await newShareSettings.save();
+
+    res.status(201).json(savedItinerary);
+  } catch (error) {
+    console.error("Error creating itinerary:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Update an existing itinerary
+app.put("/api/itineraries/:id", async (req, res) => {
+  try {
+    const { title, description, activities } = req.body;
+
+    // Check if the itinerary exists
+    const itinerary = await Itinerary.findById(req.params.id);
+
+    if (!itinerary) {
+      return res.status(404).json({ error: "Itinerary not found" });
+    }
+
+    // Update the itinerary fields
+    itinerary.title = title || itinerary.title;
+    itinerary.description = description || itinerary.description;
+    itinerary.activities = activities || itinerary.activities;
+    itinerary.updatedAt = Date.now();
+
+    const updatedItinerary = await itinerary.save();
+    res.json(updatedItinerary);
+  } catch (error) {
+    console.error("Error updating itinerary:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Delete an itinerary
+app.delete("/api/itineraries/:id", async (req, res) => {
+  try {
+    const itinerary = await Itinerary.findById(req.params.id);
+
+    if (!itinerary) {
+      return res.status(404).json({ error: "Itinerary not found" });
+    }
+
+    // Also delete associated checklist
+    await Checklist.deleteMany({ itineraryId: req.params.id });
+
+    // ✅ Also delete associated share settings
+    await ShareSettings.deleteMany({ itineraryId: req.params.id });
+
+    // Delete the itinerary
+    await Itinerary.deleteOne({ _id: req.params.id });
+
+    res.json({ message: "Itinerary deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting itinerary:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ===== ShareSettings Routes =====
 
 // Add share settings routes
 app.get("/api/sharesettings/:itineraryId", async (req, res) => {
   try {
-    const settings = await ShareSettings.findOne({ 
-      itineraryId: req.params.itineraryId 
+    const settings = await ShareSettings.findOne({
+      itineraryId: req.params.itineraryId,
     });
-    
+
     if (!settings) {
       return res.json({
         itineraryId: req.params.itineraryId,
         isPublic: false,
         description: "",
-        collaborators: []
+        collaborators: [],
       });
     }
-    
+
     res.json(settings);
   } catch (error) {
     console.error("Error fetching share settings:", error);
@@ -180,12 +299,12 @@ app.get("/api/sharesettings/:itineraryId", async (req, res) => {
 app.post("/api/sharesettings/:itineraryId", async (req, res) => {
   try {
     const { isPublic, description, collaborators } = req.body;
-    
+
     // Check if settings exist
-    let settings = await ShareSettings.findOne({ 
-      itineraryId: req.params.itineraryId 
+    let settings = await ShareSettings.findOne({
+      itineraryId: req.params.itineraryId,
     });
-    
+
     if (settings) {
       // Update existing settings
       settings.isPublic = isPublic;
@@ -199,81 +318,14 @@ app.post("/api/sharesettings/:itineraryId", async (req, res) => {
         itineraryId: req.params.itineraryId,
         isPublic,
         description,
-        collaborators
+        collaborators,
       });
       await settings.save();
     }
-    
+
     res.json(settings);
   } catch (error) {
     console.error("Error saving share settings:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Create a new itinerary
-app.post("/api/itineraries", async (req, res) => {
-  try {
-    const { title, description, activities } = req.body;
-    
-    const newItinerary = new Itinerary({
-      title,
-      description,
-      activities: activities || []
-    });
-    
-    const savedItinerary = await newItinerary.save();
-    res.status(201).json(savedItinerary);
-  } catch (error) {
-    console.error("Error creating itinerary:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Update an existing itinerary
-app.put("/api/itineraries/:id", async (req, res) => {
-  try {
-    const { title, description, activities } = req.body;
-    
-    // Check if the itinerary exists
-    const itinerary = await Itinerary.findById(req.params.id);
-    
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
-    
-    // Update the itinerary fields
-    itinerary.title = title || itinerary.title;
-    itinerary.description = description || itinerary.description;
-    itinerary.activities = activities || itinerary.activities;
-    itinerary.updatedAt = Date.now();
-    
-    const updatedItinerary = await itinerary.save();
-    res.json(updatedItinerary);
-  } catch (error) {
-    console.error("Error updating itinerary:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Delete an itinerary
-app.delete("/api/itineraries/:id", async (req, res) => {
-  try {
-    const itinerary = await Itinerary.findById(req.params.id);
-    
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
-    
-    // Also delete associated checklist
-    await Checklist.deleteMany({ itineraryId: req.params.id });
-    
-    // Delete the itinerary
-    await Itinerary.deleteOne({ _id: req.params.id });
-    
-    res.json({ message: "Itinerary deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting itinerary:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -285,24 +337,24 @@ app.get("/api/checklists/:itineraryId", async (req, res) => {
   try {
     // Check if the itinerary exists
     const itinerary = await Itinerary.findById(req.params.itineraryId);
-    
+
     if (!itinerary) {
       return res.status(404).json({ error: "Itinerary not found" });
     }
-    
+
     // Find the checklist
     const checklist = await Checklist.findOne({
-      itineraryId: req.params.itineraryId
+      itineraryId: req.params.itineraryId,
     });
-    
+
     if (!checklist) {
       // Return an empty checklist structure if none exists
       return res.json({
         itineraryId: req.params.itineraryId,
-        categories: []
+        categories: [],
       });
     }
-    
+
     res.json(checklist);
   } catch (error) {
     console.error("Error fetching checklist:", error);
@@ -315,18 +367,18 @@ app.post("/api/checklists/:itineraryId", async (req, res) => {
   try {
     // Check if the itinerary exists
     const itinerary = await Itinerary.findById(req.params.itineraryId);
-    
+
     if (!itinerary) {
       return res.status(404).json({ error: "Itinerary not found" });
     }
-    
+
     const { categories } = req.body;
-    
+
     // Find existing checklist or create a new one
     let checklist = await Checklist.findOne({
-      itineraryId: req.params.itineraryId
+      itineraryId: req.params.itineraryId,
     });
-    
+
     if (checklist) {
       // Update existing checklist
       checklist.categories = categories;
@@ -336,11 +388,11 @@ app.post("/api/checklists/:itineraryId", async (req, res) => {
       // Create new checklist
       checklist = new Checklist({
         itineraryId: req.params.itineraryId,
-        categories
+        categories,
       });
       await checklist.save();
     }
-    
+
     res.json(checklist);
   } catch (error) {
     console.error("Error saving checklist:", error);
@@ -352,21 +404,21 @@ app.post("/api/checklists/:itineraryId", async (req, res) => {
 app.patch("/api/checklists/:itineraryId/item", async (req, res) => {
   try {
     const { categoryId, itemId, completed } = req.body;
-    
+
     // Find the checklist
     const checklist = await Checklist.findOne({
-      itineraryId: req.params.itineraryId
+      itineraryId: req.params.itineraryId,
     });
-    
+
     if (!checklist) {
       return res.status(404).json({ error: "Checklist not found" });
     }
-    
+
     // Find and update the specific item
     let itemUpdated = false;
-    checklist.categories = checklist.categories.map(category => {
+    checklist.categories = checklist.categories.map((category) => {
       if (category.id === categoryId) {
-        category.items = category.items.map(item => {
+        category.items = category.items.map((item) => {
           if (item.id === itemId) {
             item.completed = completed;
             itemUpdated = true;
@@ -376,14 +428,14 @@ app.patch("/api/checklists/:itineraryId/item", async (req, res) => {
       }
       return category;
     });
-    
+
     if (!itemUpdated) {
       return res.status(404).json({ error: "Item not found" });
     }
-    
+
     checklist.updatedAt = Date.now();
     await checklist.save();
-    
+
     res.json(checklist);
   } catch (error) {
     console.error("Error updating checklist item:", error);
@@ -401,7 +453,7 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB Atlas");
-    
+
     // Start the server after successful DB connection
     const PORT = process.env.PORT || 5001;
     app.listen(PORT, () => {
