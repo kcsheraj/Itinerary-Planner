@@ -84,7 +84,7 @@ const Dashboard = () => {
             <ItineraryIcon
               key={trip._id}
               id={trip._id}
-              initialEmoji={trip.emoji || "📌"} // Default emoji
+              initialEmoji={trip.emoji || "🗺️"} // Default emoji
               initialTitle={trip.title}
               onDelete={() => handleDelete(trip._id)}
             />
