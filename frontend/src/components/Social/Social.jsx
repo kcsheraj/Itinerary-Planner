@@ -34,7 +34,7 @@ const Social = () => {
         style={{ color: "#14532d" }}
       >
         <h1 className="text-4xl font-bold mb-4">Social Page</h1>
-        <p className="text-lg">Welcome to the Social Page!</p>
+        <p className="text-lg mb-13">Welcome to the Social Page!</p>
 
         <div className="flex flex-col gap-6">
           {itineraries.map((trip) => (
