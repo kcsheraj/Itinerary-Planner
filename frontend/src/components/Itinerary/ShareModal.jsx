@@ -1,25 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import './ShareModal.css';
+import React, { useState, useEffect } from "react";
+import "./ShareModal.css";
+import axios from "axios";
 
-function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
+function ShareModal({
+  show,
+  onClose,
+  itineraryId,
+  itineraryTitle = "JAPAN 2025",
+  onSave,
+}) {
   // Original data (what's currently saved)
   const [originalCollaborators, setOriginalCollaborators] = useState([
-    { id: 1, username: 'johndoe', permission: 'read' },
-    { id: 2, username: 'janedoe', permission: 'write' }
+    { id: 1, username: "johndoe", permission: "read" },
+    { id: 2, username: "janedoe", permission: "write" },
   ]);
   const [description, setDescription] = useState(
-    'Trip to Japan starting January 1st, 2025. Includes Tokyo, Kyoto, and Osaka.'
+    "Trip to Japan starting January 1st, 2025. Includes Tokyo, Kyoto, and Osaka."
   );
   const [originalIsPublic, setOriginalIsPublic] = useState(false);
-  
+
   // Working data (what's being edited)
   const [collaborators, setCollaborators] = useState([]);
-  const [newUsername, setNewUsername] = useState('');
-  const [newPermission, setNewPermission] = useState('read');
+  const [newUsername, setNewUsername] = useState("");
+  const [newPermission, setNewPermission] = useState("read");
   const [isPublic, setIsPublic] = useState(false);
-  const [editedDescription, setEditedDescription] = useState('');
+  const [editedDescription, setEditedDescription] = useState("");
   const [isEditingDescription, setIsEditingDescription] = useState(false);
-  
+
   // Initialize working data from original data whenever modal is shown
   useEffect(() => {
     if (show) {
@@ -35,10 +42,14 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
 
   const handleAddCollaborator = () => {
     if (!newUsername.trim()) return;
-    
+
     // Check if username already exists
-    if (collaborators.some(c => c.username.toLowerCase() === newUsername.toLowerCase())) {
-      alert('This user is already a collaborator');
+    if (
+      collaborators.some(
+        (c) => c.username.toLowerCase() === newUsername.toLowerCase()
+      )
+    ) {
+      alert("This user is already a collaborator");
       return;
     }
 
@@ -47,22 +58,38 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
       {
         id: Date.now(), // Simple unique ID
         username: newUsername,
-        permission: newPermission
-      }
+        permission: newPermission,
+      },
     ]);
-    setNewUsername('');
+    setNewUsername("");
   };
 
   const handleRemoveCollaborator = (id) => {
-    setCollaborators(collaborators.filter(c => c.id !== id));
+    setCollaborators(collaborators.filter((c) => c.id !== id));
   };
 
   const handleChangePermission = (id, newPermission) => {
     setCollaborators(
-      collaborators.map(c => 
+      collaborators.map((c) =>
         c.id === id ? { ...c, permission: newPermission } : c
       )
     );
+  };
+
+  const handleSaveShareSettings = async (data) => {
+    try {
+      await axios.post(
+        `http://localhost:5001/api/sharesettings/${itineraryId}`,
+        {
+          collaborators: data.collaborators,
+          isPublic: data.isPublic,
+          description: data.description,
+        }
+      );
+      console.log("Share settings updated!");
+    } catch (error) {
+      console.error("Failed to update share settings:", error);
+    }
   };
 
   // Start editing description
@@ -84,21 +111,27 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
   };
 
   // Save all changes permanently (except description which already saves)
-  const handleSaveChanges = () => {
-    // Update the original data with all working changes
-    setOriginalCollaborators(collaborators);
-    setOriginalIsPublic(isPublic);
-    
-    // If there's an external save handler, call it
-    if (onSave) {
-      onSave({
-        collaborators,
-        description,
-        isPublic
-      });
+  const handleSaveChanges = async () => {
+    const payload = {
+      collaborators,
+      description,
+      isPublic,
+    };
+
+    try {
+      await handleSaveShareSettings(payload); // 👈 Actually call it
+      setOriginalCollaborators(collaborators);
+      setOriginalIsPublic(isPublic);
+
+      if (onSave) {
+        onSave(payload);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error("Failed to save share settings:", error);
+      alert("Failed to save changes. Please try again.");
     }
-    
-    onClose();
   };
 
   // Cancel all changes and close
@@ -108,32 +141,40 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
   };
 
   const copyShareLink = () => {
-    const shareLink = `https://itinerate.app/share/${itineraryTitle.toLowerCase().replace(/\s+/g, '-')}`;
+    const shareLink = `https://itinerate.app/share/${itineraryTitle
+      .toLowerCase()
+      .replace(/\s+/g, "-")}`;
     navigator.clipboard.writeText(shareLink);
-    alert('Share link copied to clipboard!');
+    alert("Share link copied to clipboard!");
   };
 
   return (
     <div className="modal-overlay" onClick={handleCancel}>
       <div className="share-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={handleCancel}>×</button>
-        
+        <button className="close-button" onClick={handleCancel}>
+          ×
+        </button>
+
         <div className="modal-header">
           <h2 className="modal-title">Share "{itineraryTitle}"</h2>
         </div>
-        
+
         <div className="modal-content">
           <div className="project-description-section">
             <div className="section-header">
               <h3>Project Description</h3>
-              <button 
+              <button
                 className="edit-description-btn"
-                onClick={isEditingDescription ? handleCancelEdit : startEditingDescription}
+                onClick={
+                  isEditingDescription
+                    ? handleCancelEdit
+                    : startEditingDescription
+                }
               >
-                {isEditingDescription ? 'Cancel' : 'Edit'}
+                {isEditingDescription ? "Cancel" : "Edit"}
               </button>
             </div>
-            
+
             {isEditingDescription ? (
               <div className="description-edit-container">
                 <textarea
@@ -143,7 +184,7 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
                   placeholder="Enter a description for your itinerary..."
                   rows={3}
                 />
-                <button 
+                <button
                   className="save-description-btn"
                   onClick={handleSaveDescription}
                 >
@@ -159,21 +200,21 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
             <h3>Privacy Settings</h3>
             <div className="privacy-toggle">
               <label className="switch">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={isPublic}
                   onChange={() => setIsPublic(!isPublic)}
                 />
                 <span className="slider round"></span>
               </label>
               <span className="privacy-label">
-                {isPublic ? 'Public' : 'Private'} 
+                {isPublic ? "Public" : "Private"}
               </span>
             </div>
             <p className="privacy-description">
-              {isPublic 
-                ? 'Anyone with the link can view this itinerary.' 
-                : 'Only you and your collaborators can access this itinerary.'}
+              {isPublic
+                ? "Anyone with the link can view this itinerary."
+                : "Only you and your collaborators can access this itinerary."}
             </p>
           </div>
 
@@ -181,10 +222,12 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
             <div className="share-link-section">
               <h3>Share Link</h3>
               <div className="share-link-container">
-                <input 
-                  type="text" 
-                  className="share-link-input" 
-                  value={`https://itinerate.app/share/${itineraryTitle.toLowerCase().replace(/\s+/g, '-')}`}
+                <input
+                  type="text"
+                  className="share-link-input"
+                  value={`https://itinerate.app/share/${itineraryTitle
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
                   readOnly
                 />
                 <button className="copy-link-btn" onClick={copyShareLink}>
@@ -204,7 +247,7 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
               />
-              <select 
+              <select
                 className="permission-select"
                 value={newPermission}
                 onChange={(e) => setNewPermission(e.target.value)}
@@ -213,7 +256,7 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
                 <option value="write">Can edit</option>
                 <option value="admin">Admin</option>
               </select>
-              <button 
+              <button
                 className="add-button"
                 onClick={handleAddCollaborator}
                 disabled={!newUsername.trim()}
@@ -221,30 +264,39 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
                 Add
               </button>
             </div>
-            
+
             <div className="collaborators-list">
               {collaborators.length > 0 ? (
-                collaborators.map(collaborator => (
+                collaborators.map((collaborator) => (
                   <div key={collaborator.id} className="collaborator-item">
                     <div className="collaborator-info">
                       <div className="collaborator-avatar">
                         {collaborator.username.charAt(0).toUpperCase()}
                       </div>
-                      <div className="collaborator-username">{collaborator.username}</div>
+                      <div className="collaborator-username">
+                        {collaborator.username}
+                      </div>
                     </div>
                     <div className="collaborator-actions">
                       <select
                         className="permission-select-small"
                         value={collaborator.permission}
-                        onChange={(e) => handleChangePermission(collaborator.id, e.target.value)}
+                        onChange={(e) =>
+                          handleChangePermission(
+                            collaborator.id,
+                            e.target.value
+                          )
+                        }
                       >
                         <option value="read">View only</option>
                         <option value="write">Can edit</option>
                         <option value="admin">Admin</option>
                       </select>
-                      <button 
+                      <button
                         className="remove-button"
-                        onClick={() => handleRemoveCollaborator(collaborator.id)}
+                        onClick={() =>
+                          handleRemoveCollaborator(collaborator.id)
+                        }
                       >
                         Remove
                       </button>
@@ -257,10 +309,14 @@ function ShareModal({ show, onClose, itineraryTitle = "JAPAN 2025", onSave }) {
             </div>
           </div>
         </div>
-        
+
         <div className="modal-footer">
-          <button className="cancel-button" onClick={handleCancel}>Cancel</button>
-          <button className="save-button" onClick={handleSaveChanges}>Save Changes</button>
+          <button className="cancel-button" onClick={handleCancel}>
+            Cancel
+          </button>
+          <button className="save-button" onClick={handleSaveChanges}>
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
