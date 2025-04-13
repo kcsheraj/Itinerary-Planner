@@ -9,7 +9,7 @@ const [error, setError] = useState("");
 
 const handleUpdate = async () => {
 const updated = {
-    ...itinerary,
+    itinerary,
     title,
     emoji,
     slug,
