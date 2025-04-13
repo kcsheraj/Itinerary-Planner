@@ -11,12 +11,7 @@ function ShareModal({
 }) {
   // Original data (what's currently saved)
   const [originalCollaborators, setOriginalCollaborators] = useState([
-    { id: 1, username: "johndoe", permission: "read" },
-    { id: 2, username: "janedoe", permission: "write" },
   ]);
-  const [description, setDescription] = useState(
-    "Trip to Japan starting January 1st, 2025. Includes Tokyo, Kyoto, and Osaka."
-  );
   const [originalIsPublic, setOriginalIsPublic] = useState(false);
 
   // Working data (what's being edited)
@@ -24,8 +19,6 @@ function ShareModal({
   const [newUsername, setNewUsername] = useState("");
   const [newPermission, setNewPermission] = useState("read");
   const [isPublic, setIsPublic] = useState(false);
-  const [editedDescription, setEditedDescription] = useState("");
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
 
   // Initialize working data from original data whenever modal is shown
   useEffect(() => {
@@ -83,7 +76,6 @@ function ShareModal({
         {
           collaborators: data.collaborators,
           isPublic: data.isPublic,
-          description: data.description,
         }
       );
       console.log("Share settings updated!");
@@ -92,34 +84,15 @@ function ShareModal({
     }
   };
 
-  // Start editing description
-  const startEditingDescription = () => {
-    setEditedDescription(description);
-    setIsEditingDescription(true);
-  };
-
-  // Save the edited description immediately
-  const handleSaveDescription = () => {
-    setDescription(editedDescription);
-    setIsEditingDescription(false);
-  };
-
-  // Cancel editing description without saving
-  const handleCancelEdit = () => {
-    setIsEditingDescription(false);
-    // Don't update description, just discard changes
-  };
-
-  // Save all changes permanently (except description which already saves)
+  // Save all changes permanently
   const handleSaveChanges = async () => {
     const payload = {
       collaborators,
-      description,
       isPublic,
     };
 
     try {
-      await handleSaveShareSettings(payload); // 👈 Actually call it
+      await handleSaveShareSettings(payload);
       setOriginalCollaborators(collaborators);
       setOriginalIsPublic(isPublic);
 
@@ -160,42 +133,6 @@ function ShareModal({
         </div>
 
         <div className="modal-content">
-          <div className="project-description-section">
-            <div className="section-header">
-              <h3>Project Description</h3>
-              <button
-                className="edit-description-btn"
-                onClick={
-                  isEditingDescription
-                    ? handleCancelEdit
-                    : startEditingDescription
-                }
-              >
-                {isEditingDescription ? "Cancel" : "Edit"}
-              </button>
-            </div>
-
-            {isEditingDescription ? (
-              <div className="description-edit-container">
-                <textarea
-                  className="description-textarea"
-                  value={editedDescription}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                  placeholder="Enter a description for your itinerary..."
-                  rows={3}
-                />
-                <button
-                  className="save-description-btn"
-                  onClick={handleSaveDescription}
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <p className="project-description">{description}</p>
-            )}
-          </div>
-
           <div className="privacy-section">
             <h3>Privacy Settings</h3>
             <div className="privacy-toggle">

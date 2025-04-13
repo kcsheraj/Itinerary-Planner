@@ -1,15 +1,16 @@
-//Dashboard.jsx
+// Dashboard.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Dashboard.css";
 import Navbar from "../Navbar/Navbar";
 import ItineraryIcon from "./ItineraryIcon";
-import { itineraryService } from "../../services/api"; // ✅ Import API service
-import useUserStore from "../../store/useUserStore"; // Import Zustand store
+import { itineraryService, shareService } from "../../services/api"; // Import shareService
+import useUserStore from "../../store/useUserStore";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [itineraries, setItineraries] = useState([]);
+  const [loading, setLoading] = useState(true);
   const user = useUserStore((state) => state.user);
 
   // Fetch itineraries when component mounts
@@ -17,11 +18,59 @@ const Dashboard = () => {
     const fetchItineraries = async () => {
       try {
         if (!user || !user.email) return;
-
-        const data = await itineraryService.getUserItineraries(user.email);
-        setItineraries(data);
+        setLoading(true);
+    
+        // Get both created and shared itineraries
+        const myItineraries = await itineraryService.getItineraries();
+        const sharedWithMe = await itineraryService.getUserItineraries(user.email);
+        
+        // Combine both lists (avoiding duplicates)
+        const allItineraries = [...myItineraries];
+        
+        sharedWithMe.forEach(shared => {
+          if (!allItineraries.some(existing => existing._id === shared._id)) {
+            allItineraries.push(shared);
+          }
+        });
+        
+        // Filter for:
+        // 1. Itineraries where user is creator
+        // OR
+        // 2. Itineraries where user has edit permissions
+        const filteredItineraries = [];
+        
+        for (const itinerary of allItineraries) {
+          // Always include if user is creator
+          if (itinerary.creatorUsername === user.email || 
+              itinerary.creator?.username === user.email) {
+            filteredItineraries.push(itinerary);
+            continue;
+          }
+          
+          // Check share settings for non-creator itineraries
+          try {
+            const shareSettings = await shareService.getShareSettings(itinerary._id);
+            const userCollaborator = shareSettings.collaborators.find(
+              c => c.username === user.email
+            );
+            
+            const hasEditPermission = userCollaborator && 
+                (userCollaborator.permission === "admin" || 
+                 userCollaborator.permission === "write");
+            
+            if (hasEditPermission) {
+              filteredItineraries.push(itinerary);
+            }
+          } catch (error) {
+            console.error(`Error checking permissions for itinerary ${itinerary._id}:`, error);
+          }
+        }
+        
+        setItineraries(filteredItineraries);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching itineraries:", error);
+        setLoading(false);
       }
     };
 
@@ -34,7 +83,7 @@ const Dashboard = () => {
         title: "New Itinerary",
         description: "Description of the new itinerary",
         activities: [],
-        creatorUsername: user.email, // Store the creator's username
+        creatorUsername: user.email, // Store the creator's email as username
       };
 
       const createdItinerary = await itineraryService.createItinerary(
@@ -79,17 +128,27 @@ const Dashboard = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {itineraries.map((trip) => (
-            <ItineraryIcon
-              key={trip._id}
-              id={trip._id}
-              initialEmoji={trip.emoji || "🗺️"} // Default emoji
-              initialTitle={trip.title}
-              onDelete={() => handleDelete(trip._id)}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-xl text-gray-600 my-8">Loading your itineraries...</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {itineraries.length > 0 ? (
+              itineraries.map((trip) => (
+                <ItineraryIcon
+                  key={trip._id}
+                  id={trip._id}
+                  initialEmoji={trip.emoji || "🗺️"} // Default emoji
+                  initialTitle={trip.title}
+                  onDelete={() => handleDelete(trip._id)}
+                />
+              ))
+            ) : (
+              <div className="col-span-3 text-xl text-gray-600 my-8">
+                No editable itineraries found. Create a new one to get started!
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
