@@ -1,5 +1,5 @@
 import { useState } from "react";
-import EmojiPicker from "../components/Itinerary/EmojiPicker";
+import EmojiPicker from "./EmojiPicker"; // ✅ fixed relative path
 
 const EditItineraryModal = ({ itinerary, onClose, setItineraries }) => {
 const [title, setTitle] = useState(itinerary.title);
@@ -26,7 +26,7 @@ try {
 
     const updatedItinerary = await res.json();
     setItineraries((prev) =>
-    prev.map((i) => (i._id === updatedItinerary._id ? updatedItinerary : i))
+    prev.map((item) => (item._id === itinerary._id ? updatedItinerary : item))
     );
     onClose();
 } catch (err) {
@@ -34,6 +34,8 @@ try {
     setError("Something went wrong. Please try again.");
 }
 };
+
+if (!itinerary) return null; // ✅ Prevent modal if no itinerary selected
 
 return (
 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
