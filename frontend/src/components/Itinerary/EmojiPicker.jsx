@@ -1,22 +1,17 @@
-// components/Itinerary/EmojiPicker.jsx
-
 const emojiOptions = [
-"📍", "✈️", "🏖️", "🏕️", "🏙️", "🎢", "🎡", "🎟️",
-"🎬", "🎨", "🍽️", "🍕", "🍣", "🍜", "🍺", "☕",
-"🏛️", "🏟️", "🏞️", "🛍️", "🎉", "🎶", "🗺️", "🌸"
+"📍", "✈️", "🍕", "🌸", "🍻", "🎨", "🎶", "🎉", "🏖️", "🌆", "🛍️", "🏛️", "🎢", "🍜", "🍿", "☕", "🗺️"
 ];
 
-const EmojiPicker = ({ selected, onSelect }) => {
+const EmojiPicker = ({ selectedEmoji, setSelectedEmoji }) => {
 return (
-    <div className="grid grid-cols-6 gap-2 border rounded p-2">
-    {emojiOptions.map((emoji) => (
+    <div className="grid grid-cols-6 gap-2 mb-4">
+    {emojiOptions.map((emoji, index) => (
         <button
-        key={emoji}
-        type="button"
-        className={`text-2xl p-2 rounded hover:bg-green-100 transition ${
-            selected === emoji ? "ring-2 ring-green-500" : ""
+        key={index}
+        onClick={() => setSelectedEmoji(emoji)}
+        className={`text-2xl p-2 rounded ${
+            selectedEmoji === emoji ? "ring-2 ring-green-500" : ""
         }`}
-        onClick={() => onSelect(emoji)}
         >
         {emoji}
         </button>

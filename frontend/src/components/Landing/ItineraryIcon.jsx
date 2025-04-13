@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ItineraryIcon.css"; // Ensure styles are available
 
-const ItineraryIcon = ({ id, initialEmoji, initialTitle, onDelete }) => {
+const ItineraryIcon = ({ id, initialEmoji, initialTitle, onDelete, onEdit}) => {
   const [emoji, setEmoji] = useState(initialEmoji);
   const [title, setTitle] = useState(initialTitle);
   //const [isEditing, setIsEditing] = useState(false);

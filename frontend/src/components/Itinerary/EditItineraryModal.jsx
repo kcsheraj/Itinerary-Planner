@@ -28,13 +28,13 @@ try {
     setItineraries((prev) =>
     prev.map((item) => (item._id === itinerary._id ? updatedItinerary : item))
     );
-    onClose();
+    onClose(); // ✅ closes the modal
 } catch (err) {
     console.error(err);
     setError("Something went wrong. Please try again.");
 }
 };
-
+  
 if (!itinerary) return null; // ✅ Prevent modal if no itinerary selected
 
 return (
