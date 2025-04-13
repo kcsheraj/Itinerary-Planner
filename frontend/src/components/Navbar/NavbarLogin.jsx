@@ -1,20 +1,24 @@
 import React from "react";
-import "./Navbar.css";
 import { Link } from "react-router-dom";
 
 function NavbarLogin() {
   return (
-    <div className="header-wrapper">
-      <header className="header">
+    <div className="w-full sticky top-0 z-50 bg-white/80 backdrop-blur shadow-sm">
+      <header className="flex justify-between items-center px-6 py-4">
         <div className="logo-container">
-          {/* Wrap the logo in a Link component to redirect to the login page */}
           <Link to="/">
-            <img src="/Itinerate.png" alt="Itinerate" className="logo-image" />
+            <img
+              src="/Itinerate-removebg-preview.png"
+              alt="Wandr Logo"
+              className="h-10"
+            />
           </Link>
         </div>
         <div className="nav-buttons">
           <Link to="/about">
-            <button className="nav-button about-btn">About</button>
+            <button className="text-green-900 font-semibold hover:underline">
+              About
+            </button>
           </Link>
         </div>
       </header>

@@ -1,7 +1,6 @@
 import React from "react";
 import "./App.css";
 import Itinerary from "./components/Itinerary/Itinerary";
-
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import About from "./components/Landing/About";
 import Dashboard from "./components/Landing/Dashboard"; // Protected route
@@ -36,6 +35,16 @@ function App() {
           element={
             <ProtectedRoute>
               <Itinerary />
+            </ProtectedRoute>
+          }
+        />
+        {/* Add dynamic itinerary route */}
+        <Route
+          path="/itinerary/:id" // Define the dynamic route with `:id`
+          element={
+            <ProtectedRoute>
+              <Itinerary />{" "}
+              {/* You may want to pass the ID as a prop to Itinerary */}
             </ProtectedRoute>
           }
         />
