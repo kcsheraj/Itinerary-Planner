@@ -135,56 +135,12 @@ export const itineraryService = {
   // Create a new itinerary
   createItinerary: async (itineraryData) => {
     try {
-      // Get current user from various possible storage locations
-      let creatorUsername = null;
-      
-      // Try localStorage username
-      creatorUsername = localStorage.getItem('username');
-      
-      // Try user object if stored as JSON
-      if (!creatorUsername) {
-        const userJson = localStorage.getItem('user');
-        if (userJson) {
-          try {
-            const user = JSON.parse(userJson);
-            creatorUsername = user.username || user.email || user.name || user.uid;
-          } catch (e) {
-            console.error("Error parsing user JSON:", e);
-          }
-        }
-      }
-      
-      // Fallback to Firebase username if available
-      if (!creatorUsername) {
-        const firebaseUser = localStorage.getItem('firebaseUser');
-        if (firebaseUser) {
-          try {
-            const user = JSON.parse(firebaseUser);
-            creatorUsername = user.displayName || user.email || user.uid;
-          } catch (e) {
-            console.error("Error parsing Firebase user:", e);
-          }
-        }
-      }
-      
-      // If still no username, use a hard-coded fallback
-      creatorUsername = creatorUsername || 'default-user';
-      
-      // Add creatorUsername to the itinerary data
-      const dataWithCreator = {
-        ...itineraryData,
-        creatorUsername
-      };
-      
-      console.log("Creating itinerary with creator:", creatorUsername);
-      
       const response = await axios.post(
         `${API_URL}/itineraries`,
-        dataWithCreator
+        itineraryData
       );
       return response.data;
     } catch (error) {
-      console.error("Error creating itinerary:", error);
       throw error.response?.data || error;
     }
   },
