@@ -16,7 +16,8 @@ import Navbar from "../Navbar/Navbar";
 import ItineraryIcon from "./ItineraryIcon";
 import { itineraryService } from "../../services/api"; // ✅ Import API service
 import useUserStore from "../../store/useUserStore"; // Import Zustand store
->>>>>>> origin/development
+import Navbar from "../Navbar/Navbar";
+import ItineraryIcon from "./ItineraryIcon";
 
 const Dashboard = () => {
   const navigate = useNavigate();
