@@ -61,6 +61,7 @@ const ItinerarySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  emoji: { type: String, default: "📍" },
   imageUrl: {
     type: String,
     default: "",
@@ -152,20 +153,27 @@ app.get("/api/itineraries", async (req, res) => {
 });
 
 // Get a specific itinerary by ID
-app.get("/api/itineraries/:id", async (req, res) => {
+app.put("/api/itineraries/:id", async (req, res) => {
   try {
+    const { title, description, emoji, activities } = req.body;
+
     const itinerary = await Itinerary.findById(req.params.id);
+    if (!itinerary) return res.status(404).json({ error: "Itinerary not found" });
 
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
+    itinerary.title = title ?? itinerary.title;
+    itinerary.description = description ?? itinerary.description;
+    itinerary.emoji = emoji ?? itinerary.emoji; // ✅ update emoji
+    itinerary.activities = activities ?? itinerary.activities;
+    itinerary.updatedAt = Date.now();
 
-    res.json(itinerary);
+    const updated = await itinerary.save();
+    res.json(updated);
   } catch (error) {
-    console.error("Error fetching itinerary:", error);
+    console.error("Error updating itinerary:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 // Get itineraries where user is a collaborator
 app.get("/api/user/:username/itineraries", async (req, res) => {
