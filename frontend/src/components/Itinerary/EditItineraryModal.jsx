@@ -1,43 +1,47 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import EmojiPicker from "../components/Itinerary/EmojiPicker";
 
 const EditItineraryModal = ({ itinerary, onClose, setItineraries }) => {
 const [title, setTitle] = useState(itinerary.title);
-const [emoji, setEmoji] = useState(itinerary.emoji);
-const [slug, setSlug] = useState(itinerary.slug);
+const [emoji, setEmoji] = useState(itinerary.emoji || "📍");
+const [slug, setSlug] = useState(itinerary.slug || "");
 const [error, setError] = useState("");
 
-useEffect(() => {
-setTitle(itinerary.title);
-setEmoji(itinerary.emoji);
-setSlug(itinerary.slug);
-}, [itinerary]);
+const handleUpdate = async () => {
+const updated = {
+    ...itinerary,
+    title,
+    emoji,
+    slug,
+};
 
-const handleUpdate = () => {
-if (!title || !slug) {
-    setError("Title and slug are required.");
-    return;
+try {
+    const res = await fetch(`http://localhost:5001/api/itineraries/${itinerary._id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updated),
+    });
+
+    if (!res.ok) throw new Error("Failed to update itinerary");
+
+    const updatedItinerary = await res.json();
+    setItineraries((prev) =>
+    prev.map((i) => (i._id === updatedItinerary._id ? updatedItinerary : i))
+    );
+    onClose();
+} catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
 }
-
-setItineraries((prev) =>
-    prev.map((item) =>
-    item.slug === itinerary.slug ? { ...item, title, emoji, slug } : item
-    )
-);
-
-onClose();
 };
 
 return (
 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
     <div className="bg-white p-6 rounded-md w-full max-w-md shadow-lg">
     <h2 className="text-xl font-semibold mb-4 text-green-700">Edit Itinerary</h2>
-    <input
-        type="text"
-        placeholder="Emoji (e.g. 🏝️)"
-        value={emoji}
-        onChange={(e) => setEmoji(e.target.value)}
-        className="w-full px-4 py-2 mb-3 border rounded"
-    />
+
+    <EmojiPicker selectedEmoji={emoji} setSelectedEmoji={setEmoji} />
+
     <input
         type="text"
         placeholder="Itinerary Title"
@@ -47,9 +51,11 @@ return (
     />
     <input
         type="text"
-        placeholder="Unique Name / Slug"
+        placeholder="Unique Name / Slug (e.g. beach-trip)"
         value={slug}
-        onChange={(e) => setSlug(e.target.value.trim().toLowerCase().replace(/\s+/g, "-"))}
+        onChange={(e) =>
+        setSlug(e.target.value.trim().toLowerCase().replace(/\s+/g, "-"))
+        }
         className="w-full px-4 py-2 mb-3 border rounded"
     />
     {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
@@ -58,7 +64,10 @@ return (
         <button onClick={onClose} className="px-4 py-2 text-gray-500 hover:underline">
         Cancel
         </button>
-        <button onClick={handleUpdate} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+        <button
+        onClick={handleUpdate}
+        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
         Save
         </button>
     </div>

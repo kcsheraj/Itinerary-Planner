@@ -1,5 +1,5 @@
 import { useState } from "react";
-import EmojiPicker from "./EmojiPicker"; // Make sure the path is correct
+import EmojiPicker from "../components/Itinerary/EmojiPicker";
 
 const CreateItineraryModal = ({ onClose, itineraries, setItineraries }) => {
   const [title, setTitle] = useState("");
@@ -31,8 +31,8 @@ const CreateItineraryModal = ({ onClose, itineraries, setItineraries }) => {
 
       if (!res.ok) throw new Error("Failed to create itinerary");
 
-      const saved = await res.json();
-      setItineraries([...itineraries, saved]); // ✅ correct variable here
+      const savedItinerary = await res.json();
+      setItineraries([...itineraries, savedItinerary]);
       onClose();
     } catch (err) {
       console.error(err);
@@ -43,15 +43,9 @@ const CreateItineraryModal = ({ onClose, itineraries, setItineraries }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-md w-full max-w-md shadow-lg">
-        <h2 className="text-xl font-semibold mb-4 text-green-700">
-          Create New Itinerary
-        </h2>
+        <h2 className="text-xl font-semibold mb-4 text-green-700">Create New Itinerary</h2>
 
-        {/* 🎯 Emoji Palette */}
-        <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-1">Choose an Emoji:</p>
-          <EmojiPicker selected={emoji} onSelect={setEmoji} />
-        </div>
+        <EmojiPicker selectedEmoji={emoji} setSelectedEmoji={setEmoji} />
 
         <input
           type="text"
@@ -72,10 +66,7 @@ const CreateItineraryModal = ({ onClose, itineraries, setItineraries }) => {
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
         <div className="flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-500 hover:underline"
-          >
+          <button onClick={onClose} className="px-4 py-2 text-gray-500 hover:underline">
             Cancel
           </button>
           <button
