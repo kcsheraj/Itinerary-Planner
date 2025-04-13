@@ -40,14 +40,6 @@ const ActivitySchema = new mongoose.Schema({
 });
 
 const ItinerarySchema = new mongoose.Schema({
-<<<<<<< HEAD
-  title: { type: String, required: true },
-  emoji: { type: String, default: "📍" }, // ✅ Add this line
-  description: { type: String, default: "" },
-  activities: [ActivitySchema],
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-=======
   title: {
     type: String,
     required: true,
@@ -73,7 +65,6 @@ const ItinerarySchema = new mongoose.Schema({
     type: String,
     default: "",
   },
->>>>>>> origin/development
 });
 
 // ===== Checklist SCHEMAS =====
@@ -203,15 +194,6 @@ app.get("/api/user/:username/itineraries", async (req, res) => {
 // Create a new itinerary
 app.post("/api/itineraries", async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { title, description, emoji, activities } = req.body;
-
-    const newItinerary = new Itinerary({
-      title,
-      description,
-      emoji,
-      activities: activities || []
-=======
     const { title, description, activities, creatorUsername } = req.body; // Include the creatorUsername in the request body
 
     // Create the new itinerary
@@ -220,7 +202,6 @@ app.post("/api/itineraries", async (req, res) => {
       description,
       activities: activities || [],
       creator: { username: creatorUsername }, // Store the creator's username
->>>>>>> origin/development
     });
 
     const savedItinerary = await newItinerary.save();
@@ -517,14 +498,9 @@ mongoose
     family: 4 // Forces IPv4 to avoid weird DNS issues on Windows
   })
   .then(() => {
-<<<<<<< HEAD
-    console.log("✅ Connected to MongoDB Atlas");
-
-=======
     console.log("Connected to MongoDB Atlas");
 
     // Start the server after successful DB connection
->>>>>>> origin/development
     const PORT = process.env.PORT || 5001;
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://localhost:${PORT}`);
@@ -536,9 +512,4 @@ mongoose
     console.error("🧠 Make sure your IP is whitelisted in MongoDB Atlas");
   });
 
-<<<<<<< HEAD
-
 export default app;
-=======
-export default app;
->>>>>>> origin/development
