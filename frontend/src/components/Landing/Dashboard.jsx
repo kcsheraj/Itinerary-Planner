@@ -39,7 +39,10 @@ const Dashboard = () => {
       };
 
       const createdItinerary = await itineraryService.createItinerary(newItinerary);
-      setItineraries((prev) => [...prev, createdItinerary]);
+      setItineraries((prev) =>
+        prev.map((item) => (item._id === itinerary._id ? updatedItinerary : item))
+      );
+      
       navigate(`/itinerary/${createdItinerary._id}`);
     } catch (error) {
       console.error("Error creating itinerary:", error);

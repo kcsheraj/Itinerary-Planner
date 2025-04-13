@@ -166,7 +166,12 @@ app.put("/api/itineraries/:id", async (req, res) => {
     itinerary.activities = activities ?? itinerary.activities;
     itinerary.updatedAt = Date.now();
 
-    const updated = await itinerary.save();
+    
+const updated = await Itinerary.findByIdAndUpdate(
+  req.params.id,
+  { title, emoji, slug },
+  { new: true }
+);
     res.json(updated);
   } catch (error) {
     console.error("Error updating itinerary:", error);
@@ -241,20 +246,17 @@ app.post("/api/itineraries", async (req, res) => {
 // Update an existing itinerary
 app.put("/api/itineraries/:id", async (req, res) => {
   try {
-    const { title, description, activities, imageUrl } = req.body;
+    const { title, description, emoji, activities, slug, imageUrl } = req.body;
 
-    // Check if the itinerary exists
     const itinerary = await Itinerary.findById(req.params.id);
+    if (!itinerary) return res.status(404).json({ error: "Itinerary not found" });
 
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
-
-    // Update the itinerary fields
-    itinerary.title = title || itinerary.title;
-    itinerary.description = description || itinerary.description;
-    itinerary.activities = activities || itinerary.activities;
-    itinerary.imageUrl = imageUrl || itinerary.imageUrl;
+    itinerary.title = title ?? itinerary.title;
+    itinerary.description = description ?? itinerary.description;
+    itinerary.emoji = emoji ?? itinerary.emoji;
+    itinerary.slug = slug ?? itinerary.slug;
+    itinerary.activities = activities ?? itinerary.activities;
+    itinerary.imageUrl = imageUrl ?? itinerary.imageUrl;
     itinerary.updatedAt = Date.now();
 
     const updatedItinerary = await itinerary.save();
@@ -264,6 +266,7 @@ app.put("/api/itineraries/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 // Delete an itinerary
 app.delete("/api/itineraries/:id", async (req, res) => {

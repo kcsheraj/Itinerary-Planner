@@ -9,7 +9,7 @@ const [error, setError] = useState("");
 
 const handleUpdate = async () => {
 const updated = {
-    itinerary,
+    ...itinerary,
     title,
     emoji,
     slug,
@@ -42,7 +42,11 @@ return (
     <div className="bg-white p-6 rounded-md w-full max-w-md shadow-lg">
     <h2 className="text-xl font-semibold mb-4 text-green-700">Edit Itinerary</h2>
 
-    <EmojiPicker selectedEmoji={emoji} setSelectedEmoji={setEmoji} />
+    <EmojiPicker selectedEmoji={emoji} setSelectedEmoji={(val) => {
+  console.log("Selected Emoji:", val); // 👈 this should log each time
+  setEmoji(val);
+}} />
+
 
     <input
         type="text"
