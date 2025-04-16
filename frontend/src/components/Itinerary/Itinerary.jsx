@@ -5,6 +5,8 @@ import ShareModal from "./ShareModal";
 import ChecklistModal from "./ChecklistModal";
 import Navbar from "../Navbar/Navbar";
 import { itineraryService, checklistService, shareService } from "../../services/api";
+import useUserStore from "../../store/useUserStore";
+
 
 const Itinerary = () => {
   const { id } = useParams();
@@ -39,46 +41,71 @@ const Itinerary = () => {
   // Helper function to check if user is admin
   const isAdmin = userPermission === "admin";
 
+  
+
   // Get the current user
-  const getCurrentUser = () => {
-    // Try different methods to get the current user
-    try {
-      // First try localStorage 
-      const localUsername = localStorage.getItem('username');
-      if (localUsername) return localUsername;
-      
-      // Try user object if stored as JSON
-      const userJson = localStorage.getItem('user');
-      if (userJson) {
-        const user = JSON.parse(userJson);
-        return user.username || user.email || user.name || user.uid;
-      }
-      
-      // Try Firebase auth current user
-      const firebaseUser = localStorage.getItem('firebaseUser');
-      if (firebaseUser) {
-        try {
-          const user = JSON.parse(firebaseUser);
-          return user.displayName || user.email || user.uid;
-        } catch (e) {
-          console.error("Error parsing Firebase user:", e);
+  // Improved getCurrentUser function for Itinerary.jsx
+const getCurrentUser = () => {
+  // Get the user from the useUserStore hook if available
+  // This is the most reliable method since it's maintained by your app state
+  const user = useUserStore.getState().user;
+  if (user && (user.email || user.username)) {
+    console.log("User identified from useUserStore:", user.email || user.username);
+    return user.email || user.username;
+  }
+  
+  // Try localStorage methods as fallback
+  try {
+    // Check for a user object in localStorage directly
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        if (userData && (userData.email || userData.username)) {
+          console.log("User identified from localStorage user:", userData.email || userData.username);
+          return userData.email || userData.username;
         }
+      } catch (e) {
+        console.error("Error parsing user JSON from localStorage:", e);
       }
-      
-      const firebaseToken = localStorage.getItem('firebaseToken');
-      if (firebaseToken) {
-        // Assume authenticated user
-        return 'authenticated-user'; 
-      }
-      
-      // If we get here, we couldn't identify the user
-      console.warn("Could not identify current user");
-      return 'default-user'; // Use a default username so we can access
-    } catch (err) {
-      console.error("Error getting current user:", err);
-      return 'default-user';
     }
-  };
+    
+    // Check for a Firebase user object
+    const firebaseUserStr = localStorage.getItem('firebaseUser');
+    if (firebaseUserStr) {
+      try {
+        const firebaseUser = JSON.parse(firebaseUserStr);
+        if (firebaseUser && (firebaseUser.email || firebaseUser.displayName)) {
+          console.log("User identified from Firebase user:", firebaseUser.email || firebaseUser.displayName);
+          return firebaseUser.email || firebaseUser.displayName;
+        }
+      } catch (e) {
+        console.error("Error parsing Firebase user JSON:", e);
+      }
+    }
+    
+    // Check for individual username or email entries
+    const username = localStorage.getItem('username');
+    if (username) {
+      console.log("User identified from localStorage username:", username);
+      return username;
+    }
+    
+    const email = localStorage.getItem('email');
+    if (email) {
+      console.log("User identified from localStorage email:", email);
+      return email;
+    }
+    
+    // If we couldn't identify the user from any of these methods,
+    // log a warning and return a default value
+    console.warn("Could not identify current user from any source");
+    return 'unknown-user';
+  } catch (err) {
+    console.error("Error in getCurrentUser function:", err);
+    return 'error-identifying-user';
+  }
+};
 
   // Load or create itinerary on component mount
   useEffect(() => {
@@ -402,6 +429,10 @@ const Itinerary = () => {
 
   const handleTitleBlur = () => {
     setIsEditingTitle(false);
+    // Call updateDashboard directly here to ensure title changes sync immediately
+    if (window.updateDashboard) {
+      setTimeout(() => window.updateDashboard(), 500); // Small delay to ensure API update completes
+    }
   };
 
   const handleDescriptionClick = () => {
@@ -529,54 +560,85 @@ const Itinerary = () => {
     }
   }, [itineraryId, userPermission]);
   
-  // Function to create a copy of the itinerary for the current user
-  const handleCopyItinerary = async () => {
-    try {
-      const currentUser = getCurrentUser();
-      if (!currentUser) {
-        alert("Please log in to copy itineraries");
-        return;
-      }
-  
-      // Create the copy
-      const newItinerary = {
-        title: `Copy of ${itineraryTitle}`,
-        description: itineraryDescription,
-        activities: JSON.parse(JSON.stringify(activities)),
-        imageUrl: imageUrl,
-        creator: { 
-          username: currentUser,
-          email: currentUser // or get from user object
-        },
-        creatorUsername: currentUser // legacy support if needed
-      };
-  
-      // Create itinerary
-      const created = await itineraryService.createItinerary(newItinerary);
-      console.log("Created copy:", created);
-  
-      // Immediately set admin permissions
-      await shareService.saveShareSettings(created._id, {
-        isPublic: false,
-        collaborators: [{
-          username: currentUser,
-          permission: "admin"
-        }]
-      });
-  
-      // Refresh the dashboard data in the background
-      if (window.updateDashboard) {
-        window.updateDashboard();
-      }
-  
-      alert("Itinerary copied successfully!");
-      window.location.href = `/itinerary/${created._id}`; // Go to the new copy
-      
-    } catch (err) {
-      console.error("Copy failed:", err);
-      alert("Copy failed. Please try again.");
+  // Improved handleCopyItinerary function for Itinerary.jsx
+const handleCopyItinerary = async () => {
+  try {
+    // Get current user information - prioritize useUserStore first
+    let currentUser = null;
+    
+    // First try from useUserStore (most reliable if available)
+    const userFromStore = useUserStore.getState().user;
+    if (userFromStore && (userFromStore.email || userFromStore.username)) {
+      currentUser = userFromStore.email || userFromStore.username;
+      console.log("Creating copy with user from store:", currentUser);
+    } else {
+      // Fall back to the getCurrentUser helper function
+      currentUser = getCurrentUser();
+      console.log("Creating copy with user from getCurrentUser:", currentUser);
     }
-  };
+    
+    // Validate we have a valid user identifier
+    if (!currentUser || currentUser === 'unknown-user' || currentUser === 'error-identifying-user' || currentUser === 'default-user') {
+      console.error("Cannot create copy: Invalid user identity:", currentUser);
+      alert("Cannot create a copy: Unable to identify your user account. Please try logging out and back in.");
+      return;
+    }
+  
+    // Set up the new itinerary data
+    const itineraryCopy = {
+      title: `Copy of ${itineraryTitle}`,
+      description: itineraryDescription,
+      activities: JSON.parse(JSON.stringify(activities)),
+      imageUrl: imageUrl,
+      creatorUsername: currentUser,
+      creator: {
+        username: currentUser,
+        email: currentUser
+      },
+      collaborators: [{
+        email: currentUser,
+        username: currentUser,
+        permission: "admin"
+      }]
+    };
+    
+    console.log("Creating itinerary copy with data:", itineraryCopy);
+  
+    // 1. Create the new itinerary
+    const createdCopy = await itineraryService.createItinerary(itineraryCopy);
+    console.log("Successfully created itinerary copy:", createdCopy);
+  
+    // 2. Set share settings with current user as admin collaborator
+    const shareSettings = {
+      isPublic: false,
+      collaborators: [{
+        email: currentUser,
+        username: currentUser,
+        permission: "admin"
+      }]
+    };
+    
+    console.log("Setting share settings:", shareSettings);
+    await shareService.saveShareSettings(createdCopy._id, shareSettings);
+    console.log("Successfully saved share settings");
+  
+    // 3. Refresh dashboard data if the function is available
+    if (typeof window.updateDashboard === 'function') {
+      console.log("Refreshing dashboard");
+      await window.updateDashboard();
+    } else {
+      console.warn("window.updateDashboard function not available");
+    }
+  
+    // 4. Redirect to the new itinerary
+    console.log("Redirecting to new itinerary:", createdCopy._id);
+    window.location.href = `/itinerary/${createdCopy._id}`;
+  
+  } catch (err) {
+    console.error("Error creating itinerary copy:", err);
+    alert("Failed to create a copy of the itinerary. Please try again.");
+  }
+};
 
   // Show loading indicator
   if (loading) {
