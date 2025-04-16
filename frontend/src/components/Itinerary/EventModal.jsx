@@ -83,6 +83,7 @@ function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDele
       
       if (autocompleteRef.current) {
         // Listen for place selection
+        // The updated utility provides a compatible event listener
         autocompleteRef.current.addListener('place_changed', () => {
           const place = autocompleteRef.current.getPlace();
           
@@ -255,11 +256,18 @@ function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDele
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Log the form state before submission
+    console.log("Form state before submission:", editForm);
+    
     // Format date back to string format for API
     const formattedSubmission = {
       ...editForm,
-      date: formatDateForDisplay(editForm.date)
+      date: formatDateForDisplay(editForm.date),
+      // Explicitly include bubbleClass to ensure it's not lost
+      bubbleClass: editForm.bubbleClass
     };
+    
+    console.log("Submitting with data:", formattedSubmission);
     
     onUpdate(formattedSubmission);
   };

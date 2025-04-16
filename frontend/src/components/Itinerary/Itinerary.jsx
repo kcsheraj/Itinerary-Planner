@@ -874,60 +874,64 @@ const handleCopyItinerary = async () => {
                 <div className="date-label-text">{dateKey}</div>
               </div>
 
-              {groupedActivities[dateKey].map((activity, activityIndex) => (
-                <div className="timeline-item compact-view" key={activity.id}>
-                  <div className="timeline-left">
-                    <div className="date-label">
-                      <div className="date-time">
-                        {formatTimeDisplay(activity.time)}
-                      </div>
-                      <div className="date-day">
-                        {formatDateDay(activity.date)}
-                      </div>
-                    </div>
-                    <div
-                      className={`item-bubble ${activity.bubbleClass}`}
-                      onClick={() => handleActivityClick(activity)}
-                    >
-                      <span className="item-icon">{activity.icon}</span>
-                      <div className="item-title">{activity.title}</div>
-                      <div className="duration">
-                        {formatDurationDisplay(activity.duration)}
-                      </div>
-                      <div className="cost">
-                        $
-                        {typeof activity.cost === "number"
-                          ? activity.cost.toFixed(2)
-                          : "0.00"}
-                      </div>
-                      {canEdit && (
-                        <div
-                          className="edit-icon"
-                          onClick={(e) => handleEditActivity(activity, e)}
-                        >
-                          ✏️
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              
 
-                  {/* Description on the right side */}
-                  <div className="timeline-right">
-                    <div className="event-description-container">
-                      {activity.address && (
-                        <div className="event-address">
-                          {activity.address}
-                        </div>
-                      )}
-                      {activity.description && (
-                        <div className="event-description">
-                          {activity.description}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+{groupedActivities[dateKey].map((activity, activityIndex) => (
+  <div className="timeline-item compact-view" key={activity.id}>
+    <div className="timeline-left">
+      <div className="date-label">
+        <div className="date-time">
+          {formatTimeDisplay(activity.time)}
+        </div>
+        <div className="date-day">
+          {formatDateDay(activity.date)}
+        </div>
+      </div>
+      <div
+        className={`item-bubble ${activity.bubbleClass}`}
+        onClick={() => handleActivityClick(activity)}
+      >
+        <span className="item-icon">{activity.icon}</span>
+        <div className="duration">
+          {formatDurationDisplay(activity.duration)}
+        </div>
+        <div className="cost">
+          $
+          {typeof activity.cost === "number"
+            ? activity.cost.toFixed(2)
+            : "0.00"}
+        </div>
+        {canEdit && (
+          <div
+            className="edit-icon"
+            onClick={(e) => handleEditActivity(activity, e)}
+          >
+            ✏️
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* Description on the right side */}
+    <div className="timeline-right">
+      <div className="event-description-container">
+        {/* Activity title now above the location */}
+        <h3 className="activity-title">{activity.title || "New Activity"}</h3>
+        
+        {activity.address && (
+          <div className="event-address">
+            {activity.address}
+          </div>
+        )}
+        {activity.description && (
+          <div className="event-description">
+            {activity.description}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+))}
             </div>
           ))}
         </div>

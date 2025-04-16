@@ -869,4 +869,86 @@
     white-space: nowrap;
     padding: 0.5rem 0.8rem;
   }
+
+
+  /* Add these styles to your CSS file */
+
+/* Style for the activity title above the location */
+.activity-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  padding: 0;
+  color: #333;
+}
+
+/* Make the event description container properly format the title */
+.event-description-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style the address to have proper spacing after the title */
+.event-address {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+/* Style the event description */
+.event-description {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Ensure the timeline right side has proper padding */
+.timeline-right {
+  padding: 5px 0;
+}
+
+/* Ensure timeline items have proper spacing */
+.timeline-item.compact-view {
+  margin-bottom: 15px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+/* Ensure the item bubble has good layout */
+.item-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  min-height: 100px;
+  min-width: 100px;
+  justify-content: center;
+  position: relative;
+  border-radius: 50%;
+}
+
+/* Style the icon */
+.item-icon {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+/* Make duration and cost more subtle */
+.duration, .cost {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Make sure edit icon doesn't overlap content */
+.edit-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  padding: 3px;
+  cursor: pointer;
+}
 }
