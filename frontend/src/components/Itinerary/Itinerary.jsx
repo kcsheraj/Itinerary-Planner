@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom"; 
+import { useParams } from "react-router-dom"; // Import useParams hoo
 import EventModal from "./EventModal";
 import ShareModal from "./ShareModal";
 import ChecklistModal from "./ChecklistModal";
@@ -9,7 +9,8 @@ import useUserStore from "../../store/useUserStore";
 
 
 const Itinerary = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Use useParams to get the `id` from the URL
+  // State for the itinerary data
   const [itineraryId, setItineraryId] = useState(null);
   const [itineraryTitle, setItineraryTitle] = useState("My Itinerary");
   const [itineraryDescription, setItineraryDescription] = useState(
@@ -25,7 +26,6 @@ const Itinerary = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userPermission, setUserPermission] = useState(null);
 
   // Activities state
   const [activities, setActivities] = useState([]);
@@ -113,20 +113,16 @@ const getCurrentUser = () => {
       try {
         setLoading(true);
 
-        // Get the itinerary by ID
+        // Use the first itinerary if any exist
         const itinerary = await itineraryService.getItinerary(id);
         setItineraryId(itinerary._id);
         setItineraryTitle(itinerary.title);
         setItineraryDescription(itinerary.description || "");
         setActivities(itinerary.activities || []);
+        console.log("Loaded itinerary:", itinerary);
+
         setImageUrl(itinerary.imageUrl || "");
-        
-        // Set admin permission by default for the creator
-        const currentUser = getCurrentUser();
-        if (itinerary.creator && itinerary.creator.username === currentUser) {
-          setUserPermission("admin");
-        }
-        
+
         setLoading(false);
       } catch (err) {
         console.error("Error loading itinerary:", err);
@@ -136,60 +132,12 @@ const getCurrentUser = () => {
     };
 
     loadItinerary();
-  }, [id]);
-
-  // Check user permissions
-  useEffect(() => {
-    const checkPermissions = async () => {
-      if (!itineraryId) return;
-      
-      try {
-        // Get the current user
-        const currentUser = getCurrentUser();
-        console.log("Current user:", currentUser);
-        
-        if (!currentUser) {
-          console.warn("No current user found, setting permission to no-access");
-          setUserPermission("no-access");
-          return;
-        }
-        
-        // Get share settings
-        const shareSettings = await shareService.getShareSettings(itineraryId);
-        console.log("Share settings:", shareSettings);
-        
-        // Check if user is a collaborator
-        const userCollaborator = shareSettings.collaborators.find(
-          c => c.username === currentUser
-        );
-        console.log("User collaborator:", userCollaborator);
-        
-        if (userCollaborator) {
-          // User is a collaborator, set permission from their role
-          setUserPermission(userCollaborator.permission);
-          console.log("Setting permission to:", userCollaborator.permission);
-        } else if (shareSettings.isPublic) {
-          // Public itinerary but not a collaborator = read-only
-          setUserPermission("public-read");
-          console.log("Setting permission to: public-read");
-        } else {
-          // Private itinerary and not a collaborator = no access
-          setUserPermission("no-access");
-          console.log("Setting permission to: no-access");
-        }
-      } catch (err) {
-        console.error("Error checking permissions:", err);
-        setError("Failed to verify access permissions");
-      }
-    };
-    
-    checkPermissions();
-  }, [itineraryId]);
+  }, []);
 
   // Save changes to title and description
   useEffect(() => {
     const saveItineraryDetails = async () => {
-      if (!itineraryId || loading || !canEdit) return;
+      if (!itineraryId || loading) return; // Skip if we don't have an ID yet or still loading
 
       try {
         await itineraryService.updateItinerary(itineraryId, {
@@ -203,17 +151,18 @@ const getCurrentUser = () => {
       }
     };
 
+    // Use a debounce to avoid too many API calls
     const timeoutId = setTimeout(() => {
       saveItineraryDetails();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [itineraryId, itineraryTitle, itineraryDescription, loading, canEdit]);
+  }, [itineraryId, itineraryTitle, itineraryDescription, loading]);
 
   // Save activities whenever they change
   useEffect(() => {
     const saveActivities = async () => {
-      if (!itineraryId || loading || !canEdit) return;
+      if (!itineraryId || loading) return; // Skip if we don't have an ID yet or still loading
 
       try {
         await itineraryService.updateItinerary(itineraryId, {
@@ -226,27 +175,30 @@ const getCurrentUser = () => {
       }
     };
 
+    // Use a debounce to avoid too many API calls
     const timeoutId = setTimeout(() => {
       saveActivities();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [itineraryId, activities, loading, canEdit]);
+  }, [itineraryId, activities, loading]);
 
   // Parse and format dates for consistent comparison
   const formatDateForGrouping = useCallback((dateStr) => {
     if (!dateStr) return "Unknown Date";
 
     try {
+      // Try to parse the date
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
+        // Return a consistent format for grouping
         return date.toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",
         });
       }
-      return dateStr;
+      return dateStr; // If parsing fails, use the original string
     } catch (e) {
       return dateStr;
     }
@@ -259,12 +211,14 @@ const getCurrentUser = () => {
     let hours, minutes;
 
     if (timeStr.includes("AM") || timeStr.includes("PM")) {
+      // Handle 12-hour format
       const [timePart, period] = timeStr.split(" ");
       [hours, minutes] = timePart.split(":").map(Number);
 
       if (period === "PM" && hours !== 12) hours += 12;
       if (period === "AM" && hours === 12) hours = 0;
     } else {
+      // Handle 24-hour format
       [hours, minutes] = timeStr.split(":").map(Number);
     }
 
@@ -273,6 +227,7 @@ const getCurrentUser = () => {
 
   // Group activities by date and sort within each date
   useEffect(() => {
+    // Group by date
     const groups = {};
     activities.forEach((activity) => {
       const dateKey = formatDateForGrouping(activity.date);
@@ -282,17 +237,19 @@ const getCurrentUser = () => {
       groups[dateKey].push(activity);
     });
 
+    // Sort activities within each date group by time
     Object.keys(groups).forEach((date) => {
       groups[date].sort(
         (a, b) => timeToMinutes(a.time) - timeToMinutes(b.time)
       );
     });
 
+    // Sort dates chronologically
     const sortedDates = Object.keys(groups).sort((a, b) => {
       try {
         return new Date(a) - new Date(b);
       } catch {
-        return 0;
+        return 0; // If date parsing fails, keep original order
       }
     });
 
@@ -317,7 +274,7 @@ const getCurrentUser = () => {
 
   useEffect(() => {
     const saveItineraryDetails = async () => {
-      if (!itineraryId || loading || !canEdit) return;
+      if (!itineraryId || loading) return;
 
       try {
         await itineraryService.updateItinerary(itineraryId, {
@@ -334,7 +291,7 @@ const getCurrentUser = () => {
 
     const timeoutId = setTimeout(saveItineraryDetails, 1000);
     return () => clearTimeout(timeoutId);
-  }, [itineraryId, itineraryTitle, itineraryDescription, imageUrl, loading, canEdit]);
+  }, [itineraryId, itineraryTitle, itineraryDescription, imageUrl, loading]);
 
   // Event handlers
   const handleActivityClick = (activity) => {
@@ -344,8 +301,6 @@ const getCurrentUser = () => {
   };
 
   const handleAddActivity = () => {
-    if (!canEdit) return;
-    
     const newActivity = {
       id: `act${Date.now()}`,
       title: "New Activity",
@@ -371,23 +326,21 @@ const getCurrentUser = () => {
   };
 
   const handleEditActivity = (activity, e) => {
-    if (!canEdit) return;
-    
     e.stopPropagation();
-    setSelectedEvent({ ...activity });
+    setSelectedEvent({ ...activity }); // Create a copy to avoid reference issues
     setEditMode(true);
     setShowEventModal(true);
   };
 
   const handleUpdateActivity = (updatedActivity) => {
-    if (!canEdit) return;
-    
+    // First, check if the date or time has changed
     const originalActivity = activities.find(
       (a) => a.id === updatedActivity.id
     );
     const hasDateChanged = originalActivity.date !== updatedActivity.date;
     const hasTimeChanged = originalActivity.time !== updatedActivity.time;
 
+    // Update the activity in the list
     const updatedActivities = activities.map((activity) =>
       activity.id === updatedActivity.id ? updatedActivity : activity
     );
@@ -395,6 +348,7 @@ const getCurrentUser = () => {
     setActivities(updatedActivities);
     setShowEventModal(false);
 
+    // If we need to check the result of the update
     if (hasDateChanged || hasTimeChanged) {
       console.log(
         `Activity updated: Date changed: ${hasDateChanged}, Time changed: ${hasTimeChanged}`
@@ -403,8 +357,6 @@ const getCurrentUser = () => {
   };
 
   const handleDeleteActivity = (activityId) => {
-    if (!canEdit) return;
-    
     const updatedActivities = activities.filter(
       (activity) => activity.id !== activityId
     );
@@ -413,7 +365,6 @@ const getCurrentUser = () => {
   };
 
   const handleTitleClick = () => {
-    if (!canEdit) return;
     setIsEditingTitle(true);
   };
 
@@ -436,7 +387,6 @@ const getCurrentUser = () => {
   };
 
   const handleDescriptionClick = () => {
-    if (!canEdit) return;
     setIsEditingDescription(true);
   };
 
@@ -452,22 +402,26 @@ const getCurrentUser = () => {
   const formatTimeDisplay = (timeStr) => {
     if (!timeStr) return "12:00 PM";
 
+    // If it's already in 12-hour format with AM/PM, return as is
     if (timeStr.includes("AM") || timeStr.includes("PM")) {
       return timeStr;
     }
 
+    // Handle 24-hour format
     const timeParts = timeStr.split(":");
     if (timeParts.length === 2) {
       let hours = parseInt(timeParts[0], 10);
       const minutes = timeParts[1];
       const period = hours >= 12 ? "PM" : "AM";
 
+      // Convert to 12-hour format
       hours = hours % 12;
-      hours = hours ? hours : 12;
+      hours = hours ? hours : 12; // Convert 0 to 12
 
       return `${hours}:${minutes} ${period}`;
     }
 
+    // If format is unexpected, return as is
     return timeStr;
   };
 
@@ -499,11 +453,12 @@ const getCurrentUser = () => {
           day: "numeric",
         });
       }
+      // If it's already in "Month Day" format, try to parse it
       const parts = dateStr.split(" ");
       if (parts.length >= 2) {
         return `${parts[0].substring(0, 3)} ${parts[1].replace(",", "")}`;
       }
-      return "Jan 1";
+      return "Jan 1"; // Default fallback
     } catch (e) {
       return "Jan 1";
     }
@@ -674,40 +629,6 @@ const handleCopyItinerary = async () => {
     );
   }
 
-  // Show access denied if user doesn't have permission
-  if (userPermission === "no-access") {
-    return (
-      <div className="app-container">
-        <Navbar />
-        <div className="main-content">
-          <div className="error-container">
-            <h2>Access Denied</h2>
-            <p>You don't have permission to view this itinerary.</p>
-            <div style={{ marginTop: "20px" }}>
-              <button
-                onClick={addSelfAsCollaborator}
-                className="action-button share-btn"
-              >
-                Add Self as Collaborator
-              </button>
-              <button
-                onClick={() => {
-                  // Override permission temporarily to allow share dialog to open
-                  setUserPermission("admin");
-                  setTimeout(() => setShowShareModal(true), 100);
-                }}
-                className="action-button share-btn"
-                style={{ marginLeft: "10px" }}
-              >
-                Share Settings
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="app-container">
       <Navbar />
@@ -727,42 +648,23 @@ const handleCopyItinerary = async () => {
           ) : (
             <h1 className="plan-title" onClick={handleTitleClick}>
               {itineraryTitle}
-              {canEdit && <span className="edit-icon-small">✏️</span>}
+              <span className="edit-icon-small">✏️</span>
             </h1>
           )}
 
           <div className="action-buttons">
-            {/* Only show Share button for admins */}
-            {isAdmin && (
-              <button
-                className="action-button share-btn"
-                onClick={() => setShowShareModal(true)}
-              >
-                Share
-              </button>
-            )}
-            
-            {/* Show Checklist for everyone (read-only or edit) */}
+            <button
+              className="action-button share-btn"
+              onClick={() => setShowShareModal(true)}
+            >
+              Share
+            </button>
             <button
               className="action-button checklist-btn"
               onClick={() => setShowChecklistModal(true)}
             >
               Checklist
             </button>
-            
-            {/* Add Copy button for view-only users */}
-            {(userPermission === "read" || userPermission === "public-read") && (
-              <button
-                className="action-button copy-btn"
-                onClick={handleCopyItinerary}
-                style={{ 
-                  backgroundColor: "#4CAF50",
-                  marginLeft: "10px"
-                }}
-              >
-                Make My Copy
-              </button>
-            )}
           </div>
         </div>
 
@@ -783,14 +685,14 @@ const handleCopyItinerary = async () => {
               onClick={handleDescriptionClick}
             >
               {itineraryDescription}
-              {canEdit && <span className="edit-icon-small">✏️</span>}
+              <span className="edit-icon-small">✏️</span>
             </p>
           )}
         </div>
 
         {/* Image URL */}
         <div style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}>
-          {isEditingImageUrl && canEdit ? (
+          {isEditingImageUrl ? (
             <div style={{ position: "relative" }}>
               <input
                 type="text"
@@ -811,13 +713,13 @@ const handleCopyItinerary = async () => {
             </div>
           ) : (
             <div
-              onClick={canEdit ? () => setIsEditingImageUrl(true) : undefined}
+              onClick={() => setIsEditingImageUrl(true)}
               style={{
                 position: "relative",
                 borderRadius: "0.75rem",
                 overflow: "hidden",
                 border: imageUrl ? "none" : "2px dashed #ccc",
-                cursor: canEdit ? "pointer" : "default",
+                cursor: "pointer",
                 backgroundColor: imageUrl ? "transparent" : "#fafafa",
                 display: "flex",
                 alignItems: "center",
@@ -825,54 +727,55 @@ const handleCopyItinerary = async () => {
                 minHeight: "200px",
                 transition: "all 0.3s ease",
               }}
-            >{imageUrl ? (
-              <img
-                src={imageUrl}
-                alt="Itinerary Cover"
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  maxHeight: "300px",
-                  objectFit: "cover",
-                  transition: "transform 0.3s ease",
-                }}
-                onError={(e) => (e.target.style.display = "none")}
-              />
-            ) : canEdit ? (
-              <div style={{ textAlign: "center", color: "#999" }}>
-                <p style={{ marginBottom: "0.5rem", fontSize: "1rem" }}>
-                  Click to add an image URL
-                </p>
-                <span style={{ fontSize: "1.5rem" }}>🖼️</span>
-              </div>
-            ) : null}
-          </div>
-        )}
-      </div>
-
-      {/* Cost Summary */}
-      <div className="cost-summary">
-        <div className="cost-summary-content">
-          <h3>Total Trip Cost</h3>
-          <div className="total-cost-value">${totalCost.toFixed(2)}</div>
+            >
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="Itinerary Cover"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: "300px",
+                    objectFit: "cover",
+                    transition: "transform 0.3s ease",
+                  }}
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+              ) : (
+                <div style={{ textAlign: "center", color: "#999" }}>
+                  <p style={{ marginBottom: "0.5rem", fontSize: "1rem" }}>
+                    Click to add an image URL
+                  </p>
+                  <span style={{ fontSize: "1.5rem" }}>🖼️</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Timeline Section with Compact Layout */}
-      <div className="timeline-section">
-        <div className="timeline-header">
-          <h2>TIMELINE</h2>
-          <div>
-            {activeDates.length > 0 ? formatDateDay(activeDates[0]) : "Jan 1"}
+        {/* Cost Summary */}
+        <div className="cost-summary">
+          <div className="cost-summary-content">
+            <h3>Total Trip Cost</h3>
+            <div className="total-cost-value">${totalCost.toFixed(2)}</div>
           </div>
         </div>
 
-        <div className="timeline-container">
-          {activeDates.map((dateKey) => (
-            <div key={dateKey} className="date-group">
-              <div className="date-divider">
-                <div className="date-label-text">{dateKey}</div>
-              </div>
+        {/* Timeline Section with Compact Layout */}
+        <div className="timeline-section">
+          <div className="timeline-header">
+            <h2>TIMELINE</h2>
+            <div>
+              {activeDates.length > 0 ? formatDateDay(activeDates[0]) : "Jan 1"}
+            </div>
+          </div>
+
+          <div className="timeline-container">
+            {activeDates.map((dateKey) => (
+              <div key={dateKey} className="date-group">
+                <div className="date-divider">
+                  <div className="date-label-text">{dateKey}</div>
+                </div>
 
               
 
@@ -936,58 +839,44 @@ const handleCopyItinerary = async () => {
           ))}
         </div>
 
-        {canEdit && (
           <div className="add-button-container">
             <button className="add-activity-btn" onClick={handleAddActivity}>
               Add Activity
             </button>
           </div>
-        )}
+        </div>
       </div>
-    </div>
 
-    {/* Event Modal */}
-    {showEventModal && selectedEvent && (
-      <EventModal
-        show={showEventModal}
-        event={selectedEvent}
-        onClose={() => setShowEventModal(false)}
-        isEditMode={editMode && canEdit}
-        onUpdate={handleUpdateActivity}
-        onDelete={handleDeleteActivity}
-        readOnly={!canEdit}
+      {/* Event Modal */}
+      {showEventModal && selectedEvent && (
+        <EventModal
+          show={showEventModal}
+          event={selectedEvent}
+          onClose={() => setShowEventModal(false)}
+          isEditMode={editMode}
+          onUpdate={handleUpdateActivity}
+          onDelete={handleDeleteActivity}
+        />
+      )}
+
+      {/* Share Modal */}
+      {/* Share Modal */}
+      <ShareModal
+        show={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        itineraryTitle={itineraryTitle}
+        itineraryId={itineraryId}
       />
-    )}
 
-    {/* Share Modal */}
-    <ShareModal
-      show={showShareModal}
-      onClose={() => setShowShareModal(false)}
-      itineraryTitle={itineraryTitle}
-      itineraryId={itineraryId}
-      onSave={(updatedSettings) => {
-        // After saving share settings, check if user added themselves
-        // and update their permission if needed
-        const currentUser = getCurrentUser();
-        const selfUser = updatedSettings.collaborators.find(
-          c => c.username === currentUser
-        );
-        if (selfUser) {
-          setUserPermission(selfUser.permission);
-        }
-      }}
-    />
-
-    {/* Checklist Modal */}
-    <ChecklistModal
-      show={showChecklistModal}
-      onClose={() => setShowChecklistModal(false)}
-      tripTitle={itineraryTitle}
-      itineraryId={itineraryId}
-      readOnly={!canEdit}
-    />
-  </div>
-);
+      {/* Checklist Modal */}
+      <ChecklistModal
+        show={showChecklistModal}
+        onClose={() => setShowChecklistModal(false)}
+        tripTitle={itineraryTitle}
+        itineraryId={itineraryId}
+      />
+    </div>
+  );
 };
 
 export default Itinerary;
