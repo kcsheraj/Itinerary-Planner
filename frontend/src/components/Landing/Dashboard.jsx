@@ -11,6 +11,7 @@ import useUserStore from "../../store/useUserStore";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [itineraries, setItineraries] = useState([]);
+  const [loading, setLoading] = useState(false); // Added loading state
   const user = useUserStore((state) => state.user);
   
   // Modal state
