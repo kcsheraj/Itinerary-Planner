@@ -561,84 +561,84 @@ const getCurrentUser = () => {
   }, [itineraryId, userPermission]);
   
   // Improved handleCopyItinerary function for Itinerary.jsx
-const handleCopyItinerary = async () => {
-  try {
-    // Get current user information - prioritize useUserStore first
-    let currentUser = null;
+  const handleCopyItinerary = async () => {
+    try {
+      // Get current user information
+      let currentUser = null;
+      
+      // First try from useUserStore (most reliable if available)
+      const userFromStore = useUserStore.getState().user;
+      if (userFromStore && (userFromStore.email || userFromStore.username)) {
+        currentUser = userFromStore.email || userFromStore.username;
+        console.log("Creating copy with user from store:", currentUser);
+      } else {
+        // Fall back to the getCurrentUser helper function
+        currentUser = getCurrentUser();
+        console.log("Creating copy with user from getCurrentUser:", currentUser);
+      }
+      
+      // Validate we have a valid user identifier
+      if (!currentUser || currentUser === 'unknown-user' || currentUser === 'error-identifying-user' || currentUser === 'default-user') {
+        console.error("Cannot create copy: Invalid user identity:", currentUser);
+        alert("Cannot create a copy: Unable to identify your user account. Please try logging out and back in.");
+        return;
+      }
     
-    // First try from useUserStore (most reliable if available)
-    const userFromStore = useUserStore.getState().user;
-    if (userFromStore && (userFromStore.email || userFromStore.username)) {
-      currentUser = userFromStore.email || userFromStore.username;
-      console.log("Creating copy with user from store:", currentUser);
-    } else {
-      // Fall back to the getCurrentUser helper function
-      currentUser = getCurrentUser();
-      console.log("Creating copy with user from getCurrentUser:", currentUser);
+      // Set up the new itinerary data (make a deep copy to ensure complete separation)
+      const itineraryCopy = {
+        title: `Copy of ${itineraryTitle}`,
+        description: itineraryDescription,
+        activities: JSON.parse(JSON.stringify(activities)),
+        imageUrl: imageUrl,
+        emoji: event?.emoji || "🗺️",    // Preserve emoji if available
+        color: event?.color || "#E3F2FD",  // Preserve color if available
+        textColor: event?.textColor || "#1565C0",  // Preserve text color if available
+        creatorUsername: currentUser,
+        creator: {
+          username: currentUser,
+          email: currentUser
+        }
+        // Do NOT include collaborators from the original - we'll set new ones
+      };
+      
+      console.log("Creating itinerary copy with data:", itineraryCopy);
+    
+      // 1. Create the new itinerary
+      const createdCopy = await itineraryService.createItinerary(itineraryCopy);
+      console.log("Successfully created itinerary copy:", createdCopy);
+    
+      // 2. Set share settings with ONLY current user as admin collaborator
+      // This ensures we don't modify the original itinerary's permissions
+      const shareSettings = {
+        isPublic: false,  // Start as private by default
+        collaborators: [{
+          email: currentUser,
+          username: currentUser,
+          permission: "admin"
+        }]
+      };
+      
+      console.log("Setting share settings for NEW itinerary:", shareSettings);
+      await shareService.saveShareSettings(createdCopy._id, shareSettings);
+      console.log("Successfully saved share settings for the copy");
+    
+      // 3. Refresh dashboard data if the function is available
+      if (typeof window.updateDashboard === 'function') {
+        console.log("Refreshing dashboard");
+        await window.updateDashboard();
+      } else {
+        console.warn("window.updateDashboard function not available");
+      }
+    
+      // 4. Redirect to the new itinerary
+      console.log("Redirecting to new itinerary:", createdCopy._id);
+      window.location.href = `/itinerary/${createdCopy._id}`;
+    
+    } catch (err) {
+      console.error("Error creating itinerary copy:", err);
+      alert("Failed to create a copy of the itinerary. Please try again.");
     }
-    
-    // Validate we have a valid user identifier
-    if (!currentUser || currentUser === 'unknown-user' || currentUser === 'error-identifying-user' || currentUser === 'default-user') {
-      console.error("Cannot create copy: Invalid user identity:", currentUser);
-      alert("Cannot create a copy: Unable to identify your user account. Please try logging out and back in.");
-      return;
-    }
-  
-    // Set up the new itinerary data
-    const itineraryCopy = {
-      title: `Copy of ${itineraryTitle}`,
-      description: itineraryDescription,
-      activities: JSON.parse(JSON.stringify(activities)),
-      imageUrl: imageUrl,
-      creatorUsername: currentUser,
-      creator: {
-        username: currentUser,
-        email: currentUser
-      },
-      collaborators: [{
-        email: currentUser,
-        username: currentUser,
-        permission: "admin"
-      }]
-    };
-    
-    console.log("Creating itinerary copy with data:", itineraryCopy);
-  
-    // 1. Create the new itinerary
-    const createdCopy = await itineraryService.createItinerary(itineraryCopy);
-    console.log("Successfully created itinerary copy:", createdCopy);
-  
-    // 2. Set share settings with current user as admin collaborator
-    const shareSettings = {
-      isPublic: false,
-      collaborators: [{
-        email: currentUser,
-        username: currentUser,
-        permission: "admin"
-      }]
-    };
-    
-    console.log("Setting share settings:", shareSettings);
-    await shareService.saveShareSettings(createdCopy._id, shareSettings);
-    console.log("Successfully saved share settings");
-  
-    // 3. Refresh dashboard data if the function is available
-    if (typeof window.updateDashboard === 'function') {
-      console.log("Refreshing dashboard");
-      await window.updateDashboard();
-    } else {
-      console.warn("window.updateDashboard function not available");
-    }
-  
-    // 4. Redirect to the new itinerary
-    console.log("Redirecting to new itinerary:", createdCopy._id);
-    window.location.href = `/itinerary/${createdCopy._id}`;
-  
-  } catch (err) {
-    console.error("Error creating itinerary copy:", err);
-    alert("Failed to create a copy of the itinerary. Please try again.");
-  }
-};
+  };
 
   // Show loading indicator
   if (loading) {
