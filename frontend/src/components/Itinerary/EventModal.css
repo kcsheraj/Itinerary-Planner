@@ -628,4 +628,40 @@ textarea.form-control {
   .cancel-button {
     width: 100%;
   }
+
+  .orange-bubble {
+    background-color: var(--bubble-orange, #FFF3E0);
+    border: 1px solid rgba(239, 108, 0, 0.2);
+  }
+  
+  .yellow-bubble {
+    background-color: var(--bubble-yellow, #FFFDE7);
+    border: 1px solid rgba(249, 168, 37, 0.2);
+  }
+  
+  /* Make sure these classes are also properly defined in the existing CSS file
+     if you have other bubble classes like these: */
+  .airport-bubble {
+    background-color: var(--bubble-blue, #E3F2FD);
+    border: 1px solid rgba(21, 101, 192, 0.2);
+  }
+  
+  .home-bubble {
+    background-color: var(--bubble-green, #E8F5E9);
+    border: 1px solid rgba(46, 125, 50, 0.2);
+  }
+  
+  .uber-bubble {
+    background-color: var(--bubble-red, #FFEBEE);
+    border: 1px solid rgba(198, 40, 40, 0.2);
+  }
+  
+  .purple-bubble {
+    background-color: var(--bubble-purple, #EDE7F6);
+    border: 1px solid rgba(123, 31, 162, 0.2);
+  }
+  
+
+
+
 }

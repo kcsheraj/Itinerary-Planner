@@ -14,7 +14,7 @@ import {
 
 const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDelete }) {
+function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDelete,readOnly = false }) {
   const addressInputRef = useRef(null);
   const autocompleteRef = useRef(null);
   const mapRef = useRef(null);
@@ -83,28 +83,42 @@ function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDele
       
       if (autocompleteRef.current) {
         // Listen for place selection
-        autocompleteRef.current.addListener('place_changed', () => {
-          const place = autocompleteRef.current.getPlace();
-          
-          if (!place.geometry) {
-            console.log("No details available for input: '" + place.name + "'");
-            return;
-          }
-          
-          // Update map with place
-          if (mapRef.current && markerRef.current) {
-            updateMapWithPlace(mapRef.current, markerRef.current, place);
-          }
-          
-          // Update form with selected address
-          setEditForm({
-            ...editForm,
-            address: place.formatted_address
-          });
-          
-          // Show the map preview
-          setPreviewMapVisible(true);
-        });
+        // The updated utility provides a compatible event listener
+        // Inside your EventModal.jsx, modify the place_changed event listener:
+
+autocompleteRef.current.addListener('place_changed', () => {
+  const place = autocompleteRef.current.getPlace();
+  
+  console.log("Place selected:", place); // Debug the place object
+  
+  // Check if place and place.geometry exist before trying to use them
+  if (!place || !place.geometry) {
+    console.log("No geometry information available for selected place:", place?.name || "unknown");
+    // Still update form with whatever address we have, but don't try to update the map
+    if (place && place.name) {
+      setEditForm({
+        ...editForm,
+        address: place.name // Use the name if formatted_address isn't available
+      });
+    }
+    return;
+  }
+  
+  // Now we know both place and place.geometry exist
+  // Update map with place
+  if (mapRef.current && markerRef.current) {
+    updateMapWithPlace(mapRef.current, markerRef.current, place);
+  }
+  
+  // Update form with selected address
+  setEditForm({
+    ...editForm,
+    address: place.formatted_address || place.name || addressInputRef.current.value
+  });
+  
+  // Show the map preview
+  setPreviewMapVisible(true);
+});
       }
     }
     
@@ -255,11 +269,18 @@ function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDele
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Log the form state before submission
+    console.log("Form state before submission:", editForm);
+    
     // Format date back to string format for API
     const formattedSubmission = {
       ...editForm,
-      date: formatDateForDisplay(editForm.date)
+      date: formatDateForDisplay(editForm.date),
+      // Explicitly include bubbleClass to ensure it's not lost
+      bubbleClass: editForm.bubbleClass
     };
+    
+    console.log("Submitting with data:", formattedSubmission);
     
     onUpdate(formattedSubmission);
   };
@@ -516,96 +537,108 @@ function EventModal({ show, event, onClose, isEditMode = false, onUpdate, onDele
           </div>
         </div>
       </div>
-      
-      <div className="edit-form-footer">
-        <button type="button" className="cancel-button" onClick={onClose}>
-          Cancel
-        </button>
-        <button type="button" className="delete-button" onClick={handleDelete}>
-          Delete
-        </button>
-        <button type="submit" className="save-button">
-          Save
-        </button>
-      </div>
+
+<div className="edit-form-footer">
+  <button type="button" className="cancel-button" onClick={onClose}>
+    Cancel
+  </button>
+  <button type="button" className="delete-button" onClick={handleDelete}>
+    Delete
+  </button>
+  <button 
+    type="button" 
+    className="save-button" 
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleSubmit(e);
+    }}
+  >
+    Save
+  </button>
+</div>
     </form>
   );
 
   // Render the view mode
-  const renderViewMode = () => (
-    <div className="view-mode-container">
-      <div className="modal-header">
-        <div className="modal-icon-container" style={{ backgroundColor: getColorByClass(event.bubbleClass) }}>
-          <span className="modal-icon">{event.icon}</span>
-        </div>
-        <h2 className="modal-title">{event.title}</h2>
+  // Render the view mode with conditional buttons
+const renderViewMode = () => (
+  <div className="view-mode-container">
+    <div className="modal-header">
+      <div className="modal-icon-container" style={{ backgroundColor: getColorByClass(event.bubbleClass) }}>
+        <span className="modal-icon">{event.icon}</span>
       </div>
-      
-      <div className="modal-content">
-        <div className="event-details-layout">
-          <div className="event-details-left">
-            <div className="info-section">
-              <div className="info-row">
-                <div className="info-label">Date:</div>
-                <div className="info-value">{event.date || 'Jan 1, 2025'}</div>
-              </div>
-              
-              <div className="info-row">
-                <div className="info-label">Start:</div>
-                <div className="info-value">{format12HourTime(event.time)}</div>
-              </div>
-              
-              <div className="info-row">
-                <div className="info-label">End:</div>
-                <div className="info-value">{getEndTime()}</div>
-              </div>
-              
-              <div className="info-row">
-                <div className="info-label">Duration:</div>
-                <div className="info-value">{formatDuration(event.duration)}</div>
-              </div>
-              
-              <div className="info-row">
-                <div className="info-label">Cost:</div>
-                <div className="info-value">{typeof event.cost === 'number' 
-                  ? `$${event.cost.toFixed(2)}` 
-                  : event.cost || '$0.00'}</div>
-              </div>
+      <h2 className="modal-title">{event.title}</h2>
+    </div>
+    
+    <div className="modal-content">
+      <div className="event-details-layout">
+        <div className="event-details-left">
+          <div className="info-section">
+            <div className="info-row">
+              <div className="info-label">Date:</div>
+              <div className="info-value">{event.date || 'Jan 1, 2025'}</div>
+            </div>
+            
+            <div className="info-row">
+              <div className="info-label">Start:</div>
+              <div className="info-value">{format12HourTime(event.time)}</div>
+            </div>
+            
+            <div className="info-row">
+              <div className="info-label">End:</div>
+              <div className="info-value">{getEndTime()}</div>
+            </div>
+            
+            <div className="info-row">
+              <div className="info-label">Duration:</div>
+              <div className="info-value">{formatDuration(event.duration)}</div>
+            </div>
+            
+            <div className="info-row">
+              <div className="info-label">Cost:</div>
+              <div className="info-value">{typeof event.cost === 'number' 
+                ? `$${event.cost.toFixed(2)}` 
+                : event.cost || '$0.00'}</div>
             </div>
           </div>
+        </div>
+        
+        <div className="event-details-right">
+          {event.address && (
+            <div className="address-section">
+              <h3>Location</h3>
+              <p className="address">{event.address}</p>
+              <div className="map-container">
+                <iframe
+                  title="Event Location"
+                  width="100%"
+                  height="160"
+                  frameBorder="0"
+                  src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(event.address)}`}
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          )}
           
-          <div className="event-details-right">
-            {event.address && (
-              <div className="address-section">
-                <h3>Location</h3>
-                <p className="address">{event.address}</p>
-                <div className="map-container">
-                  <iframe
-                    title="Event Location"
-                    width="100%"
-                    height="160"
-                    frameBorder="0"
-                    src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(event.address)}`}
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              </div>
-            )}
-            
-            {event.description && (
-              <div className="description-section">
-                <h3>Description</h3>
-                <p className="description">{event.description}</p>
-              </div>
-            )}
-          </div>
+          {event.description && (
+            <div className="description-section">
+              <h3>Description</h3>
+              <p className="description">{event.description}</p>
+            </div>
+          )}
         </div>
       </div>
-      
-      <div className="modal-footer">
-        <button className="delete-button" onClick={handleDelete}>Delete</button>
-        <button className="edit-button" onClick={() => setEditModeLocal(true)}>Edit</button>
-      </div>
+    </div>
+    
+    {/* Only show footer with buttons if user has permissions */}
+    {!readOnly && (
+        <div className="modal-footer">
+          <button className="delete-button" onClick={handleDelete}>Delete</button>
+          <button className="edit-button" onClick={() => setEditModeLocal(true)}>Edit</button>
+        </div>
+      )}
     </div>
   );
 

@@ -1,0 +1,211 @@
+/* CreateItineraryModal.css - fixed version */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .create-itinerary-modal {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .close-button:hover {
+    color: #000;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .itinerary-preview {
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .preview-emoji {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+  
+  .preview-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group label {
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .title-input {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+  }
+  
+  .title-input:focus {
+    border-color: #2E7D32;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+  }
+  
+  .emoji-selector {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  
+  .emoji-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .emoji-option:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .emoji-option.selected {
+    background-color: #e3f2fd;
+    box-shadow: 0 0 0 2px #2196f3;
+  }
+  
+  /* Fixed color selector styles */
+  .color-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .color-option {
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    /* Fixed width issue */
+    width: 100%;
+    /* Ensure text doesn't overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .color-option:hover {
+    transform: scale(1.05);
+  }
+  
+  .color-option.selected {
+    box-shadow: 0 0 0 2px #2196f3;
+    transform: scale(1.05);
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid #eaeaea;
+  }
+  
+  .save-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .cancel-button, .save-button, .save-open-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .cancel-button {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+  
+  .cancel-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .save-button, .save-open-button {
+    background-color: #2E7D32;
+    color: white;
+  }
+  
+  .save-button:hover, .save-open-button:hover {
+    background-color: #1B5E20;
+  }
