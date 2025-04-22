@@ -62,6 +62,18 @@ const ItinerarySchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  emoji: {
+    type: String,
+    default: "🗺️",
+  },
+  color: {
+    type: String,
+    default: "#E3F2FD",
+  },
+  textColor: {
+    type: String,
+    default: "#1565C0",
+  },
 });
 
 // ===== Checklist SCHEMAS =====
@@ -227,7 +239,15 @@ app.post("/api/itineraries", async (req, res) => {
 // Update an existing itinerary
 app.put("/api/itineraries/:id", async (req, res) => {
   try {
-    const { title, description, activities, imageUrl } = req.body;
+    const {
+      title,
+      description,
+      activities,
+      imageUrl,
+      emoji,
+      color,
+      textColor,
+    } = req.body;
 
     // Check if the itinerary exists
     const itinerary = await Itinerary.findById(req.params.id);
@@ -241,6 +261,9 @@ app.put("/api/itineraries/:id", async (req, res) => {
     itinerary.description = description || itinerary.description;
     itinerary.activities = activities || itinerary.activities;
     itinerary.imageUrl = imageUrl || itinerary.imageUrl;
+    itinerary.emoji = emoji || itinerary.emoji;
+    itinerary.color = color || itinerary.color;
+    itinerary.textColor = textColor || itinerary.textColor;
     itinerary.updatedAt = Date.now();
 
     const updatedItinerary = await itinerary.save();
