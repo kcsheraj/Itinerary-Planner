@@ -1,9 +1,28 @@
 import React, { useState } from "react";
 import "./CreateItineraryModal.css";
+import { useEffect } from "react";
 
 const EMOJI_OPTIONS = [
-  "🗺️", "✈️", "🏝️", "🏔️", "🏙️", "🚗", "🚆", "🚢", "🏕️", "🏖️", 
-  "🗽", "🏰", "🌄", "🌅", "🌇", "🌉", "🌋", "🏞️", "🎢", "🏨"
+  "🗺️",
+  "✈️",
+  "🏝️",
+  "🏔️",
+  "🏙️",
+  "🚗",
+  "🚆",
+  "🚢",
+  "🏕️",
+  "🏖️",
+  "🗽",
+  "🏰",
+  "🌄",
+  "🌅",
+  "🌇",
+  "🌉",
+  "🌋",
+  "🏞️",
+  "🎢",
+  "🏨",
 ];
 
 const COLOR_OPTIONS = [
@@ -14,21 +33,42 @@ const COLOR_OPTIONS = [
   { name: "Orange", value: "#FFF3E0", textColor: "#EF6C00" },
   { name: "Teal", value: "#E0F2F1", textColor: "#00796B" },
   { name: "Red", value: "#FFEBEE", textColor: "#C62828" },
-  { name: "Yellow", value: "#FFFDE7", textColor: "#F9A825" }
+  { name: "Yellow", value: "#FFFDE7", textColor: "#F9A825" },
 ];
 
-const CreateItineraryModal = ({ 
-  isOpen, 
-  onClose, 
-  onSave, 
+const CreateItineraryModal = ({
+  isOpen,
+  onClose,
+  onSave,
   onSaveAndOpen,
-  initialData = null
+  initialData = null,
 }) => {
   // Initialize state with initial data if provided (for editing)
   const [title, setTitle] = useState(initialData?.title || "New Itinerary");
   const [emoji, setEmoji] = useState(initialData?.emoji || "🗺️");
-  const [color, setColor] = useState(initialData?.color || COLOR_OPTIONS[0].value);
-  const [textColor, setTextColor] = useState(initialData?.textColor || COLOR_OPTIONS[0].textColor);
+  const [color, setColor] = useState(
+    initialData?.color || COLOR_OPTIONS[0].value
+  );
+  const [textColor, setTextColor] = useState(
+    initialData?.textColor || COLOR_OPTIONS[0].textColor
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setTitle(initialData.title || "");
+        setEmoji(initialData.emoji || "🗺️");
+        setColor(initialData.color || COLOR_OPTIONS[0].value);
+        setTextColor(initialData.textColor || COLOR_OPTIONS[0].textColor);
+      } else {
+        // Reset to default values
+        setTitle("New Itinerary");
+        setEmoji("🗺️");
+        setColor(COLOR_OPTIONS[0].value);
+        setTextColor(COLOR_OPTIONS[0].textColor);
+      }
+    }
+  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
@@ -46,9 +86,9 @@ const CreateItineraryModal = ({
       title,
       emoji,
       color,
-      textColor
+      textColor,
     };
-    
+
     if (openAfterSave) {
       onSaveAndOpen(itineraryData);
     } else {
@@ -58,28 +98,35 @@ const CreateItineraryModal = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="create-itinerary-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="create-itinerary-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h2>{initialData ? "Edit Itinerary" : "Create New Itinerary"}</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="modal-content">
           {/* Preview Section */}
           <div className="itinerary-preview" style={{ backgroundColor: color }}>
             <div className="preview-emoji">{emoji}</div>
-            <div className="preview-title" style={{ color: textColor }}>{title}</div>
+            <div className="preview-title" style={{ color: textColor }}>
+              {title}
+            </div>
           </div>
 
           {/* Form Section */}
           <div className="form-section">
             <div className="form-group">
               <label htmlFor="itinerary-title">Title:</label>
-              <input 
-                type="text" 
-                id="itinerary-title" 
-                value={title} 
-                onChange={(e) => setTitle(e.target.value)} 
+              <input
+                type="text"
+                id="itinerary-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="title-input"
               />
             </div>
@@ -88,9 +135,11 @@ const CreateItineraryModal = ({
               <label>Select Emoji:</label>
               <div className="emoji-selector">
                 {EMOJI_OPTIONS.map((option) => (
-                  <div 
-                    key={option} 
-                    className={`emoji-option ${emoji === option ? 'selected' : ''}`}
+                  <div
+                    key={option}
+                    className={`emoji-option ${
+                      emoji === option ? "selected" : ""
+                    }`}
                     onClick={() => handleEmojiSelect(option)}
                   >
                     {option}
@@ -103,10 +152,15 @@ const CreateItineraryModal = ({
               <label>Select Color:</label>
               <div className="color-selector">
                 {COLOR_OPTIONS.map((option) => (
-                  <div 
-                    key={option.name} 
-                    className={`color-option ${color === option.value ? 'selected' : ''}`}
-                    style={{ backgroundColor: option.value, color: option.textColor }}
+                  <div
+                    key={option.name}
+                    className={`color-option ${
+                      color === option.value ? "selected" : ""
+                    }`}
+                    style={{
+                      backgroundColor: option.value,
+                      color: option.textColor,
+                    }}
                     onClick={() => handleColorSelect(option)}
                   >
                     {option.name}
@@ -125,7 +179,10 @@ const CreateItineraryModal = ({
             <button className="save-button" onClick={() => handleSubmit(false)}>
               Save
             </button>
-            <button className="save-open-button" onClick={() => handleSubmit(true)}>
+            <button
+              className="save-open-button"
+              onClick={() => handleSubmit(true)}
+            >
               Save & Open
             </button>
           </div>

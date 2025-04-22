@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [itineraries, setItineraries] = useState([]);
   const [loading, setLoading] = useState(false);
   const user = useUserStore((state) => state.user);
-  
+
   // Modal state
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -27,45 +27,53 @@ const Dashboard = () => {
 
       // Get both created and shared itineraries
       const myItineraries = await itineraryService.getItineraries();
-      const sharedWithMe = await itineraryService.getUserItineraries(user.email);
-      
+      const sharedWithMe = await itineraryService.getUserItineraries(
+        user.email
+      );
+
       // Combine both lists (avoiding duplicates)
       const allItineraries = [...myItineraries];
-      
-      sharedWithMe.forEach(shared => {
-        if (!allItineraries.some(existing => existing._id === shared._id)) {
+
+      sharedWithMe.forEach((shared) => {
+        if (!allItineraries.some((existing) => existing._id === shared._id)) {
           allItineraries.push(shared);
         }
       });
-      
+
       console.log("All fetched itineraries:", allItineraries);
-      
+
       // Filter for only itineraries where user has edit permissions
       const editableItineraries = [];
-      
+
       for (const itinerary of allItineraries) {
         try {
           // Check share settings
-          const shareSettings = await shareService.getShareSettings(itinerary._id);
-          
+          const shareSettings = await shareService.getShareSettings(
+            itinerary._id
+          );
+
           // Check if user has "write" or "admin" permission
           const userCollaborator = shareSettings.collaborators.find(
-            c => c.username === user.email
+            (c) => c.username === user.email
           );
-          
-          const hasEditPermission = userCollaborator && 
-              (userCollaborator.permission === "admin" || 
-               userCollaborator.permission === "write");
-          
+
+          const hasEditPermission =
+            userCollaborator &&
+            (userCollaborator.permission === "admin" ||
+              userCollaborator.permission === "write");
+
           // If user can edit, add to the list
           if (hasEditPermission) {
             editableItineraries.push(itinerary);
           }
         } catch (error) {
-          console.error(`Error checking permissions for itinerary ${itinerary._id}:`, error);
+          console.error(
+            `Error checking permissions for itinerary ${itinerary._id}:`,
+            error
+          );
         }
       }
-      
+
       console.log("Editable itineraries:", editableItineraries);
       setItineraries(editableItineraries);
       setLoading(false);
@@ -78,7 +86,7 @@ const Dashboard = () => {
   // Expose the fetchItineraries function globally
   useEffect(() => {
     window.updateDashboard = fetchItineraries;
-    
+
     return () => {
       delete window.updateDashboard;
     };
@@ -105,7 +113,7 @@ const Dashboard = () => {
         console.error("No user email available");
         return;
       }
-  
+
       const newItinerary = {
         title: itineraryData.title,
         description: "Description of the new itinerary",
@@ -116,38 +124,46 @@ const Dashboard = () => {
         creatorUsername: user.email,
         creator: {
           username: user.email,
-          email: user.email
-        },
-        collaborators: [{
           email: user.email,
-          username: user.email,
-          permission: "admin"
-        }]
+        },
+        collaborators: [
+          {
+            email: user.email,
+            username: user.email,
+            permission: "admin",
+          },
+        ],
       };
-  
+
       // 1. Create the itinerary
-      const createdItinerary = await itineraryService.createItinerary(newItinerary);
+      const createdItinerary = await itineraryService.createItinerary(
+        newItinerary
+      );
       console.log("Successfully created itinerary:", createdItinerary);
-  
+
       // 2. Set share settings with user as admin collaborator
       await shareService.saveShareSettings(createdItinerary._id, {
         isPublic: false,
-        collaborators: [{
-          email: user.email,
-          username: user.email,
-          permission: "admin"
-        }]
+        collaborators: [
+          {
+            email: user.email,
+            username: user.email,
+            permission: "admin",
+          },
+        ],
       });
-  
+
       // 3. Update local state and close modal
-      setItineraries((prev) => [...prev, {
-        ...createdItinerary,
-        emoji: itineraryData.emoji,
-        color: itineraryData.color,
-        textColor: itineraryData.textColor
-      }]);
+      setItineraries((prev) => [
+        ...prev,
+        {
+          ...createdItinerary,
+          emoji: itineraryData.emoji,
+          color: itineraryData.color,
+          textColor: itineraryData.textColor,
+        },
+      ]);
       setCreateModalOpen(false);
-  
     } catch (error) {
       console.error("Error creating itinerary:", error);
       alert("Failed to create itinerary. Please check console for details.");
@@ -160,7 +176,7 @@ const Dashboard = () => {
         console.error("No user email available");
         return;
       }
-  
+
       const newItinerary = {
         title: itineraryData.title,
         description: "Description of the new itinerary",
@@ -171,32 +187,37 @@ const Dashboard = () => {
         creatorUsername: user.email,
         creator: {
           username: user.email,
-          email: user.email
-        },
-        collaborators: [{
           email: user.email,
-          username: user.email,
-          permission: "admin"
-        }]
+        },
+        collaborators: [
+          {
+            email: user.email,
+            username: user.email,
+            permission: "admin",
+          },
+        ],
       };
-  
+
       // 1. Create the itinerary
-      const createdItinerary = await itineraryService.createItinerary(newItinerary);
-  
+      const createdItinerary = await itineraryService.createItinerary(
+        newItinerary
+      );
+
       // 2. Set share settings with user as admin collaborator
       await shareService.saveShareSettings(createdItinerary._id, {
         isPublic: false,
-        collaborators: [{
-          email: user.email,
-          username: user.email,
-          permission: "admin"
-        }]
+        collaborators: [
+          {
+            email: user.email,
+            username: user.email,
+            permission: "admin",
+          },
+        ],
       });
-  
+
       // 3. Close modal and navigate to the new itinerary
       setCreateModalOpen(false);
       navigate(`/itinerary/${createdItinerary._id}`);
-  
     } catch (error) {
       console.error("Error creating itinerary:", error);
       alert("Failed to create itinerary. Please check console for details.");
@@ -209,36 +230,33 @@ const Dashboard = () => {
         console.error("No itinerary selected for update");
         return;
       }
-      
+
       console.log("Updating itinerary with data:", itineraryData);
-  
+
       // 1. Update the itinerary
       const updateData = {
         title: itineraryData.title,
         emoji: itineraryData.emoji,
         color: itineraryData.color,
-        textColor: itineraryData.textColor
+        textColor: itineraryData.textColor,
       };
-      
+
       const response = await itineraryService.updateItinerary(
-        currentItinerary._id, 
+        currentItinerary._id,
         updateData
       );
-      
+
       console.log("Update response:", response);
-  
+
       // 2. Update local state and close modal
-      setItineraries((prev) => 
-        prev.map(item => 
-          item._id === currentItinerary._id 
-            ? {...item, ...updateData} 
-            : item
+      setItineraries((prev) =>
+        prev.map((item) =>
+          item._id === currentItinerary._id ? { ...item, ...updateData } : item
         )
       );
-      
+
       setEditModalOpen(false);
       setCurrentItinerary(null);
-  
     } catch (error) {
       console.error("Error updating itinerary:", error);
       alert("Failed to update itinerary. Please check console for details.");
@@ -262,7 +280,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container relative overflow-hidden">
       <Navbar />
-      
+
       {/* Decorative elements */}
       <div className="decorative-shapes">
         <div className="shape circle-1"></div>
@@ -282,10 +300,7 @@ const Dashboard = () => {
         </h1>
 
         <div className="flex justify-center gap-4 mb-8">
-          <button
-            onClick={handleNewItinerary}
-            className="go-itinerary-btn"
-          >
+          <button onClick={handleNewItinerary} className="go-itinerary-btn">
             <span className="btn-icon">+</span> New Itinerary
           </button>
         </div>
@@ -293,20 +308,26 @@ const Dashboard = () => {
         {loading ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <div className="text-xl text-gray-600 my-8">Loading your itineraries...</div>
+            <div className="text-xl text-gray-600 my-8">
+              Loading your itineraries...
+            </div>
           </div>
         ) : (
           <div className="itinerary-grid">
             {itineraries.length > 0 ? (
               itineraries.map((trip) => (
                 <div key={trip._id} className="itinerary-card-wrapper relative">
-                  <div className="itinerary-card" 
-                       style={{
-                         backgroundColor: trip.color || "#ffffff",
-                         color: trip.textColor || "#000000"
-                       }}>
+                  <div
+                    className="itinerary-card"
+                    style={{
+                      backgroundColor: trip.color || "#ffffff",
+                      color: trip.textColor || "#000000",
+                    }}
+                  >
                     <div className="card-content">
-                      <div className="itinerary-emoji">{trip.emoji || "🗺️"}</div>
+                      <div className="itinerary-emoji">
+                        {trip.emoji || "🗺️"}
+                      </div>
                       <h3 className="itinerary-title">{trip.title}</h3>
                       <div className="card-actions">
                         <button
@@ -338,7 +359,10 @@ const Dashboard = () => {
             ) : (
               <div className="empty-state col-span-3 text-xl text-gray-600 my-8 p-8 bg-white bg-opacity-70 rounded-xl shadow-lg">
                 <div className="empty-icon">📝</div>
-                <p>No editable itineraries found. Create a new one to get started!</p>
+                <p>
+                  No editable itineraries found. Create a new one to get
+                  started!
+                </p>
               </div>
             )}
           </div>
