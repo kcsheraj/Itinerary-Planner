@@ -645,6 +645,15 @@ const getCurrentUser = () => {
     return (
       <div className="app-container">
         <Navbar />
+
+  <div className="decorative-elements">
+    <div className="circle-decoration circle-1"></div>
+    <div className="circle-decoration circle-2"></div>
+    <div className="circle-decoration circle-3"></div>
+    <div className="triangle-decoration triangle-1"></div>
+    <div className="triangle-decoration triangle-2"></div>
+    <div className="wave-decoration"></div>
+  </div>
         <div className="main-content">
           <div className="loading-container">
             <p>Loading your itinerary...</p>
@@ -659,6 +668,15 @@ const getCurrentUser = () => {
     return (
       <div className="app-container">
         <Navbar />
+
+  <div className="decorative-elements">
+    <div className="circle-decoration circle-1"></div>
+    <div className="circle-decoration circle-2"></div>
+    <div className="circle-decoration circle-3"></div>
+    <div className="triangle-decoration triangle-1"></div>
+    <div className="triangle-decoration triangle-2"></div>
+    <div className="wave-decoration"></div>
+  </div>
         <div className="main-content">
           <div className="error-container">
             <p>{error}</p>
@@ -679,6 +697,15 @@ const getCurrentUser = () => {
     return (
       <div className="app-container">
         <Navbar />
+
+  <div className="decorative-elements">
+    <div className="circle-decoration circle-1"></div>
+    <div className="circle-decoration circle-2"></div>
+    <div className="circle-decoration circle-3"></div>
+    <div className="triangle-decoration triangle-1"></div>
+    <div className="triangle-decoration triangle-2"></div>
+    <div className="wave-decoration"></div>
+  </div>
         <div className="main-content">
           <div className="error-container">
             <h2>Access Denied</h2>
@@ -713,6 +740,15 @@ const getCurrentUser = () => {
       <Navbar />
       <div className="main-content">
         {/* Header with editable title */}
+
+  <div className="decorative-elements">
+    <div className="circle-decoration circle-1"></div>
+    <div className="circle-decoration circle-2"></div>
+    <div className="circle-decoration circle-3"></div>
+    <div className="triangle-decoration triangle-1"></div>
+    <div className="triangle-decoration triangle-2"></div>
+    <div className="wave-decoration"></div>
+  </div>
         <div className="plan-header">
           {isEditingTitle ? (
             <input
@@ -787,6 +823,7 @@ const getCurrentUser = () => {
             </p>
           )}
         </div>
+        
 
         {/* Image URL */}
         <div style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}>
@@ -912,20 +949,33 @@ const getCurrentUser = () => {
                   </div>
 
                   {/* Description on the right side */}
-                  <div className="timeline-right">
-                    <div className="event-description-container">
-                      {activity.address && (
-                        <div className="event-address">
-                          {activity.address}
-                        </div>
-                      )}
-                      {activity.description && (
-                        <div className="event-description">
-                          {activity.description}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* Description on the right side */}
+<div className="timeline-right">
+  <div className="event-description-container">
+    {/* Add activity title at the top */}
+    <h3 className="activity-title">{activity.title}</h3>
+    
+    {activity.address && (
+      <div className="event-address">
+        {activity.address}
+      </div>
+    )}
+    {activity.description && (
+      <div className="event-description">
+        {activity.description}
+      </div>
+    )}
+    {/* Add edit button only if user has edit permission */}
+    {canEdit && (
+      <button
+        className="edit-event-button"
+        onClick={(e) => handleEditActivity(activity, e)}
+      >
+        Edit Details ✏️
+      </button>
+    )}
+  </div>
+</div>
                 </div>
               ))}
             </div>

@@ -1,4 +1,4 @@
-// Dashboard.jsx with Create Itinerary Modal
+// Dashboard.jsx with Create Itinerary Modal and decorative elements
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Dashboard.css";
@@ -11,7 +11,7 @@ import useUserStore from "../../store/useUserStore";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [itineraries, setItineraries] = useState([]);
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
   const user = useUserStore((state) => state.user);
   
   // Modal state
@@ -75,12 +75,10 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  // Expose the fetchItineraries function globally so it can be called from other components
+  // Expose the fetchItineraries function globally
   useEffect(() => {
-    // Add the function to the window object so it can be accessed globally
     window.updateDashboard = fetchItineraries;
     
-    // Cleanup function to remove the global reference when component unmounts
     return () => {
       delete window.updateDashboard;
     };
@@ -262,48 +260,85 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-green-100">
+    <div className="dashboard-container relative overflow-hidden">
       <Navbar />
+      
+      {/* Decorative elements */}
+      <div className="decorative-shapes">
+        <div className="shape circle-1"></div>
+        <div className="shape circle-2"></div>
+        <div className="shape circle-3"></div>
+        <div className="shape triangle-1"></div>
+        <div className="shape triangle-2"></div>
+        <div className="shape square-1"></div>
+        <div className="shape square-2"></div>
+        <div className="shape wave-1"></div>
+        <div className="shape wave-2"></div>
+      </div>
 
-      <div className="w-full max-w-4xl mt-12 mx-auto text-center px-4 md:px-8 lg:px-16 xl:px-24">
-        <h1 className="text-4xl font-bold mb-6 text-green-900">Dashboard</h1>
+      <div className="dashboard-content w-full max-w-4xl mt-12 mx-auto text-center px-4 md:px-8 lg:px-16 xl:px-24 relative z-10">
+        <h1 className="dashboard-title">
+          <span className="title-highlight">Dashboard</span>
+        </h1>
 
         <div className="flex justify-center gap-4 mb-8">
           <button
             onClick={handleNewItinerary}
-            className="px-8 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700"
+            className="go-itinerary-btn"
           >
-            New Itinerary
+            <span className="btn-icon">+</span> New Itinerary
           </button>
         </div>
 
         {loading ? (
-          <div className="text-xl text-gray-600 my-8">Loading your itineraries...</div>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <div className="text-xl text-gray-600 my-8">Loading your itineraries...</div>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="itinerary-grid">
             {itineraries.length > 0 ? (
               itineraries.map((trip) => (
-                <div key={trip._id} className="relative">
-                  <ItineraryIcon
-                    id={trip._id}
-                    initialEmoji={trip.emoji || "🗺️"}
-                    initialTitle={trip.title}
-                    backgroundColor={trip.color}
-                    textColor={trip.textColor}
-                    onDelete={() => handleDelete(trip._id)}
-                  />
-                  <button
-                    onClick={() => handleEditItinerary(trip)}
-                    className="absolute bottom-2 left-2 bg-white text-green-600 rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-green-50"
-                    title="Edit Itinerary"
-                  >
-                    ✏️
-                  </button>
+                <div key={trip._id} className="itinerary-card-wrapper relative">
+                  <div className="itinerary-card" 
+                       style={{
+                         backgroundColor: trip.color || "#ffffff",
+                         color: trip.textColor || "#000000"
+                       }}>
+                    <div className="card-content">
+                      <div className="itinerary-emoji">{trip.emoji || "🗺️"}</div>
+                      <h3 className="itinerary-title">{trip.title}</h3>
+                      <div className="card-actions">
+                        <button
+                          onClick={() => navigate(`/itinerary/${trip._id}`)}
+                          className="card-btn view-btn"
+                          title="View Itinerary"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => handleEditItinerary(trip)}
+                          className="card-btn edit-btn"
+                          title="Edit Itinerary"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(trip._id)}
+                          className="card-btn delete-btn"
+                          title="Delete Itinerary"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-3 text-xl text-gray-600 my-8">
-                No editable itineraries found. Create a new one to get started!
+              <div className="empty-state col-span-3 text-xl text-gray-600 my-8 p-8 bg-white bg-opacity-70 rounded-xl shadow-lg">
+                <div className="empty-icon">📝</div>
+                <p>No editable itineraries found. Create a new one to get started!</p>
               </div>
             )}
           </div>

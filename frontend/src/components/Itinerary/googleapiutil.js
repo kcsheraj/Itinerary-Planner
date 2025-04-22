@@ -1,6 +1,6 @@
 /**
  * Google Maps Place Picker Utilities
- * Updated to use PlaceAutocompleteElement as recommended by Google
+ * Updated to use PlacesAutocomplete with dropdown UI
  */
 
 // Function to load the Google Maps API script with proper async loading
@@ -78,7 +78,7 @@ export const initializeMap = (mapElement, options = {}) => {
   }
 };
 
-// Create a simple bridge between the new PlaceAutocompleteElement API and existing code
+// Updated initialization function for Places Autocomplete
 export const initPlacesAutocomplete = (inputElement, options = {}) => {
   if (!inputElement || !window.google || !window.google.maps || !window.google.maps.places) {
     console.error("Google Maps Places API not available");
@@ -86,141 +86,71 @@ export const initPlacesAutocomplete = (inputElement, options = {}) => {
   }
   
   try {
-    console.log("Setting up the Places API integration");
+    console.log("Setting up Google Places Autocomplete");
     
-    // We'll create a wrapper that mimics the Autocomplete API
-    const autocompleteWrapper = {
-      _listeners: [],
-      _placeData: null,
-      
-      // Get the selected place
-      getPlace: function() {
-        return this._placeData;
-      },
-      
-      // Add a listener for the place_changed event
-      addListener: function(eventName, callback) {
-        if (eventName === 'place_changed') {
-          this._listeners.push(callback);
-        }
-      },
-      
-      // Trigger the place_changed event
-      _triggerPlaceChanged: function() {
-        for (const listener of this._listeners) {
-          listener();
-        }
-      }
+    // Create the autocomplete object
+    const autocompleteOptions = {
+      types: options.types || ['geocode', 'establishment'],
+      fields: ['place_id', 'formatted_address', 'geometry', 'name', 'address_components'],
     };
     
-    // Create a hidden div for the PlacesService
-    const placesServiceDiv = document.createElement('div');
-    placesServiceDiv.style.display = 'none';
-    document.body.appendChild(placesServiceDiv);
+    // If bounds are provided, add them to the options
+    if (options.bounds) {
+      autocompleteOptions.bounds = options.bounds;
+    }
     
-    // Create a PlacesService for getting place details
-    const placesService = new window.google.maps.places.PlacesService(placesServiceDiv);
+    // Create the proper Google Places Autocomplete with dropdown
+    const autocomplete = new window.google.maps.places.Autocomplete(
+      inputElement,
+      autocompleteOptions
+    );
     
-    // Add the normal autocomplete behavior using browser's datalist
-    const datalistId = `places-autocomplete-${Math.random().toString(36).substr(2, 9)}`;
-    const datalist = document.createElement('datalist');
-    datalist.id = datalistId;
-    inputElement.setAttribute('list', datalistId);
-    inputElement.parentNode.appendChild(datalist);
-    
-    // Create an invisible span for the sessiontoken
-    const sessionTokenContainer = document.createElement('span');
-    sessionTokenContainer.style.display = 'none';
-    sessionTokenContainer.id = 'session-token-container';
-    inputElement.parentNode.appendChild(sessionTokenContainer);
-    
-    // Generate a new session token for autocomplete
-    let sessionToken = new window.google.maps.places.AutocompleteSessionToken();
-    
-    // Handle input changes
-    let timeoutId = null;
-    inputElement.addEventListener('input', () => {
-      // Clear previous timeout
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      
-      const query = inputElement.value.trim();
-      if (query.length < 3) {
-        return;
-      }
-      
-      // Debounce the API calls
-      timeoutId = setTimeout(() => {
-        // Clear existing options
-        datalist.innerHTML = '';
-        
-        // Get place predictions
-        const autocompleteService = new window.google.maps.places.AutocompleteService();
-        autocompleteService.getPlacePredictions({
-          input: query,
-          sessionToken: sessionToken,
-          types: options.types || ['address']
-        }, (predictions, status) => {
-          if (status !== window.google.maps.places.PlacesServiceStatus.OK || !predictions) {
-            return;
-          }
-          
-          // Add options to datalist
-          for (const prediction of predictions) {
-            const option = document.createElement('option');
-            option.value = prediction.description;
-            option.setAttribute('data-place-id', prediction.place_id);
-            datalist.appendChild(option);
-          }
-        });
-      }, 300);
-    });
-    
-    // Handle selection
-    inputElement.addEventListener('change', () => {
-      const selectedValue = inputElement.value;
-      
-      // Find the corresponding option to get the place_id
-      let selectedPlaceId = null;
-      for (const option of datalist.options) {
-        if (option.value === selectedValue) {
-          selectedPlaceId = option.getAttribute('data-place-id');
-          break;
-        }
-      }
-      
-      if (!selectedPlaceId) {
-        // Try to find a place by geocoding the entered address
-        geocodeAddress(selectedValue, (result) => {
-          if (result) {
-            autocompleteWrapper._placeData = result;
-            autocompleteWrapper._triggerPlaceChanged();
-          }
-        });
-        return;
-      }
-      
-      // Get place details
-      placesService.getDetails({
-        placeId: selectedPlaceId,
-        fields: ['formatted_address', 'geometry', 'name', 'address_components'],
-        sessionToken: sessionToken
-      }, (place, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          // Store the place data
-          autocompleteWrapper._placeData = place;
-          
-          // Trigger the place_changed event
-          autocompleteWrapper._triggerPlaceChanged();
-          
-          // Generate a new session token for the next search
-          sessionToken = new window.google.maps.places.AutocompleteSessionToken();
-        }
+    // Set the country restriction if provided
+    if (options.countries && options.countries.length) {
+      autocomplete.setComponentRestrictions({
+        country: options.countries
       });
+    }
+    
+    // Fix for invisible text issue - preserve original value
+    const originalValue = inputElement.value;
+    
+    // Add event listener to ensure text remains visible
+    inputElement.addEventListener('blur', () => {
+      // Sometimes autocomplete clears the input value, restore it if needed
+      if (!inputElement.value && originalValue) {
+        setTimeout(() => {
+          if (!inputElement.value) {
+            inputElement.value = originalValue;
+          }
+        }, 100);
+      }
     });
     
-    return autocompleteWrapper;
+    // Add custom behavior to handle focus/blur events
+    inputElement.addEventListener('focus', () => {
+      // Add a class we can style when focused
+      inputElement.classList.add('pac-active');
+    });
+    
+    // Fix for Google's CSS overriding input color
+    const observer = new MutationObserver((mutations) => {
+      // When autocomplete dropdown appears or changes
+      const pacContainers = document.querySelectorAll('.pac-container');
+      if (pacContainers.length > 0) {
+        // Make sure our text is still visible
+        inputElement.style.color = '#000';
+        inputElement.style.backgroundColor = '#fff';
+      }
+    });
+    
+    // Observe the body for added/removed pac-container elements
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    
+    return autocomplete;
   } catch (error) {
     console.error("Error initializing Places Autocomplete:", error);
     return null;

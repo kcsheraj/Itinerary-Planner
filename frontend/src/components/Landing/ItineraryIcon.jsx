@@ -9,7 +9,8 @@ const ItineraryIcon = ({
   backgroundColor = "#E3F2FD", 
   textColor = "#1565C0", 
   onDelete,
-  onEdit 
+  onEdit,
+  hideDelete = false // Add hideDelete prop with default value false
 }) => {
   const [emoji, setEmoji] = useState(initialEmoji);
   const [title, setTitle] = useState(initialTitle);
@@ -21,7 +22,8 @@ const ItineraryIcon = ({
     initialEmoji,
     initialTitle,
     backgroundColor,
-    textColor
+    textColor,
+    hideDelete
   });
   
   // Fetch the latest itinerary data to ensure all fields are up to date
@@ -80,12 +82,15 @@ const ItineraryIcon = ({
           {title}
         </h3>
       </div>
-      <button
-        onClick={handleDelete}
-        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full opacity-80 hover:opacity-100"
-      >
-        ×
-      </button>
+      {/* Only render delete button if hideDelete is false and onDelete exists */}
+      {!hideDelete && onDelete && (
+        <button
+          onClick={handleDelete}
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full opacity-80 hover:opacity-100"
+        >
+          ×
+        </button>
+      )}
     </Link>
   );
 };
