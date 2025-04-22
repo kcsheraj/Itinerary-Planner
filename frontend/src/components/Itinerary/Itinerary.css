@@ -283,6 +283,7 @@
   resize: none;
   font-family: inherit;
   box-sizing: border-box;
+  color: #1a1a1a;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow-sm);
 }
