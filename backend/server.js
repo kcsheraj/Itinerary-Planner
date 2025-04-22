@@ -1,8 +1,8 @@
 // server.js
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -12,6 +12,9 @@ const app = express();
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
+
+console.log("Mongo URI:", process.env.MONGO_URI);
+
 
 // Middleware to allow cross-origin requests
 app.use(
@@ -58,6 +61,7 @@ const ItinerarySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  emoji: { type: String, default: "📍" },
   imageUrl: {
     type: String,
     default: "",
@@ -149,20 +153,32 @@ app.get("/api/itineraries", async (req, res) => {
 });
 
 // Get a specific itinerary by ID
-app.get("/api/itineraries/:id", async (req, res) => {
+app.put("/api/itineraries/:id", async (req, res) => {
   try {
+    const { title, description, emoji, activities } = req.body;
+
     const itinerary = await Itinerary.findById(req.params.id);
+    if (!itinerary) return res.status(404).json({ error: "Itinerary not found" });
 
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
+    itinerary.title = title ?? itinerary.title;
+    itinerary.description = description ?? itinerary.description;
+    itinerary.emoji = emoji ?? itinerary.emoji; // ✅ update emoji
+    itinerary.activities = activities ?? itinerary.activities;
+    itinerary.updatedAt = Date.now();
 
-    res.json(itinerary);
+    
+const updated = await Itinerary.findByIdAndUpdate(
+  req.params.id,
+  { title, emoji, slug },
+  { new: true }
+);
+    res.json(updated);
   } catch (error) {
-    console.error("Error fetching itinerary:", error);
+    console.error("Error updating itinerary:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 // Get itineraries where user is a collaborator
 app.get("/api/user/:username/itineraries", async (req, res) => {
@@ -224,23 +240,23 @@ app.post("/api/itineraries", async (req, res) => {
   }
 });
 
+
+
+
 // Update an existing itinerary
 app.put("/api/itineraries/:id", async (req, res) => {
   try {
-    const { title, description, activities, imageUrl } = req.body;
+    const { title, description, emoji, activities, slug, imageUrl } = req.body;
 
-    // Check if the itinerary exists
     const itinerary = await Itinerary.findById(req.params.id);
+    if (!itinerary) return res.status(404).json({ error: "Itinerary not found" });
 
-    if (!itinerary) {
-      return res.status(404).json({ error: "Itinerary not found" });
-    }
-
-    // Update the itinerary fields
-    itinerary.title = title || itinerary.title;
-    itinerary.description = description || itinerary.description;
-    itinerary.activities = activities || itinerary.activities;
-    itinerary.imageUrl = imageUrl || itinerary.imageUrl;
+    itinerary.title = title ?? itinerary.title;
+    itinerary.description = description ?? itinerary.description;
+    itinerary.emoji = emoji ?? itinerary.emoji;
+    itinerary.slug = slug ?? itinerary.slug;
+    itinerary.activities = activities ?? itinerary.activities;
+    itinerary.imageUrl = imageUrl ?? itinerary.imageUrl;
     itinerary.updatedAt = Date.now();
 
     const updatedItinerary = await itinerary.save();
@@ -250,6 +266,7 @@ app.put("/api/itineraries/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 // Delete an itinerary
 app.delete("/api/itineraries/:id", async (req, res) => {
@@ -488,18 +505,22 @@ app.get("/api/health", (req, res) => {
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    family: 4 // Forces IPv4 to avoid weird DNS issues on Windows
+  })
   .then(() => {
     console.log("Connected to MongoDB Atlas");
 
     // Start the server after successful DB connection
     const PORT = process.env.PORT || 5001;
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("MongoDB connection error:", err);
+    console.error("❌ MongoDB connection error:");
+    console.error(err.message); // only show the useful message
+    console.error("🧠 Make sure your IP is whitelisted in MongoDB Atlas");
   });
 
 export default app;
