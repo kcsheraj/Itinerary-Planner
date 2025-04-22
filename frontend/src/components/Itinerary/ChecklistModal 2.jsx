@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import './Itinerary.css';
+import React, { useEffect, useState } from 'react';
 import { checklistService } from '../../services/api';
+import './Itinerary.css';
 
 const defaultCategories = [
   {
@@ -65,7 +65,7 @@ const defaultCategories = [
   }
 ];
 
-function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }) {
+function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId, readOnly = false }) {
   const [categories, setCategories] = useState(defaultCategories);
   const [activeCategory, setActiveCategory] = useState('essentials');
   const [newItemText, setNewItemText] = useState('');
@@ -135,7 +135,8 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
 
   // Save to MongoDB when categories change
   useEffect(() => {
-    if (!show || !itineraryId) return;
+    // Skip saving if in read-only mode or if not showing
+    if (!show || !itineraryId || readOnly) return;
     
     const saveChecklist = async () => {
       try {
@@ -164,13 +165,16 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
     }, 1000);
     
     return () => clearTimeout(timeoutId);
-  }, [categories, itineraryId, tripTitle, show]);
+  }, [categories, itineraryId, tripTitle, show, readOnly]);
 
   if (!show) {
     return null;
   }
 
   const toggleItemCompletion = (itemId) => {
+    // Skip if in read-only mode
+    if (readOnly) return;
+    
     setCategories(categories.map(category => ({
       ...category,
       items: category.items.map(item => 
@@ -180,6 +184,9 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
   };
 
   const addNewItem = () => {
+    // Skip if in read-only mode
+    if (readOnly) return;
+    
     if (!newItemText.trim()) return;
     
     setCategories(categories.map(category => {
@@ -203,12 +210,15 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !readOnly) {
       addNewItem();
     }
   };
 
   const deleteItem = (itemId) => {
+    // Skip if in read-only mode
+    if (readOnly) return;
+    
     setCategories(categories.map(category => ({
       ...category,
       items: category.items.filter(item => item.id !== itemId)
@@ -239,7 +249,10 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
     <div className="modal-overlay" onClick={onClose}>
       <div className="checklist-modal" onClick={(e) => e.stopPropagation()}>
         <div className="checklist-header">
-          <h2 className="checklist-title">Trip Checklist for {tripTitle}</h2>
+          <h2 className="checklist-title">
+            Trip Checklist for {tripTitle}
+            {readOnly && <span className="read-only-badge"> (View Only)</span>}
+          </h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
         
@@ -285,6 +298,7 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
                     className="checklist-checkbox"
                     checked={item.completed}
                     onChange={() => toggleItemCompletion(item.id)}
+                    disabled={readOnly}
                     id={`item-${item.id}`}
                   />
                   <label 
@@ -293,38 +307,45 @@ function ChecklistModal({ show, onClose, tripTitle = "JAPAN 2025", itineraryId }
                   >
                     {item.text}
                   </label>
-                  <button 
-                    onClick={() => deleteItem(item.id)}
-                    style={{ 
-                      background: 'none', 
-                      border: 'none', 
-                      cursor: 'pointer',
-                      color: 'var(--text-light)',
-                      fontSize: '1rem'
-                    }}
-                    aria-label="Delete item"
-                  >
-                    ×
-                  </button>
+                  {/* Only show delete button if not in readOnly mode */}
+                  {!readOnly && (
+                    <button 
+                      onClick={() => deleteItem(item.id)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer',
+                        color: 'var(--text-light)',
+                        fontSize: '1rem'
+                      }}
+                      aria-label="Delete item"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               ))
             ) : (
               <div className="empty-category-message">
-                No items in this category yet. Add some below!
+                No items in this category yet.
+                {!readOnly && " Add some below!"}
               </div>
             )}
           </div>
           
-          <div className="add-item-input">
-            <input
-              type="text"
-              placeholder="Add new item..."
-              value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-            <button onClick={addNewItem}>Add</button>
-          </div>
+          {/* Only show the add item input if not in readOnly mode */}
+          {!readOnly && (
+            <div className="add-item-input">
+              <input
+                type="text"
+                placeholder="Add new item..."
+                value={newItemText}
+                onChange={(e) => setNewItemText(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+              <button onClick={addNewItem}>Add</button>
+            </div>
+          )}
         </div>
         
         <div className="checklist-footer">
