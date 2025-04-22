@@ -203,7 +203,15 @@ app.get("/api/user/:username/itineraries", async (req, res) => {
 // Create a new itinerary
 app.post("/api/itineraries", async (req, res) => {
   try {
-    const { title, description, activities, creatorUsername } = req.body; // Include the creatorUsername in the request body
+    const {
+      title,
+      description,
+      activities,
+      creatorUsername,
+      emoji,
+      color,
+      textColor,
+    } = req.body; // Include the creatorUsername in the request body
 
     // Create the new itinerary
     const newItinerary = new Itinerary({
@@ -211,6 +219,9 @@ app.post("/api/itineraries", async (req, res) => {
       description,
       activities: activities || [],
       creator: { username: creatorUsername }, // Store the creator's username
+      emoji: emoji || "🗺️",
+      color: color || "#E3F2FD",
+      textColor: textColor || "#1565C0",
     });
 
     const savedItinerary = await newItinerary.save();
