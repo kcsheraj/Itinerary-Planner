@@ -46,11 +46,11 @@ const Social = () => {
       </div>
 
       <Navbar />
-      
+
       <div className="social-content">
         <div className="social-header-box">
           <h1 className="social-title">Social Page</h1>
-          <p className="social-subtitle">Welcome to the Social Page!</p>
+          <p className="social-subtitle">Browse other Wander's Itenaries!</p>
         </div>
 
         {loading ? (
@@ -76,7 +76,9 @@ const Social = () => {
               <div className="empty-state">
                 <div className="empty-icon">🔍</div>
                 <h3>No public itineraries found</h3>
-                <p>Be the first to share your travel plans with the community!</p>
+                <p>
+                  Be the first to share your travel plans with the community!
+                </p>
               </div>
             )}
           </div>

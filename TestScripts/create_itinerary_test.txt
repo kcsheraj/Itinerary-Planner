@@ -1,0 +1,16 @@
+Feature: Create a new itinerary
+
+Goal: Test if the user can successfully create a new itinerary.
+
+Steps:
+1. Go to the Dashboard page.
+2. Click the “+ New Itinerary” button.
+3. Fill in a title (e.g., “Spring Break”), pick a color, and select an emoji.
+4. Click “Save”.
+
+Expected Result:
+- A new itinerary card should appear on the dashboard with the correct title, color, and emoji.
+- The app should not crash or reload.
+
+Tester: Alex M. (External User)
+Feedback: “Worked smoothly. I was confused at first about the emoji selection but figured it out.”

@@ -1,0 +1,19 @@
+Feature: Share an itinerary with another user
+
+Goal: Test if a user can share an existing itinerary with another user via email.
+
+Steps:
+1. Go to the Dashboard page.
+2. Select an existing itinerary (e.g., “Spring Break”).
+3. Click the “Share” button/icon.
+4. Enter the email of another user (e.g., testuser@example.com).
+5. Set permissions (Viewer or Editor).
+6. Click “Share”.
+
+Expected Result:
+- The itinerary should show that it has been shared.
+- The invited user should see the itinerary on their dashboard when they log in.
+- Proper permission levels should apply (e.g., Viewer cannot edit).
+
+Tester: Sara L. (External User)  
+Feedback: “Sharing worked fine! It would be nice if it confirmed the email was valid before clicking ‘Share’.”
