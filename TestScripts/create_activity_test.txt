@@ -3,15 +3,18 @@ Feature: Add a new activity to an itinerary
 Goal: Test if a user can create a new activity inside an existing itinerary.
 
 Steps:
-1. Go to the Dashboard and open an itinerary (e.g., “Spring Break”).
-2. Click “Add Activity” or the "+" icon.
-3. Fill in the activity title (e.g., “Visit the beach”), time, and notes.
+1. Go to the Dashboard and open an itinerary (e.g., “Paris”).
+2. Click “Add Activity”
+3. Fill in the activity title (e.g., “Visit the beach”), time, cost, location,emoji, color and description.
 4. Click “Save”.
+5. Edit the activity by changing any element.
+6. Finally Delete the activity. 
 
 Expected Result:
 - The new activity should be listed in the itinerary.
 - The time and notes should display correctly.
+- The color and emoji should display correctly.
 - The activity should be editable or deletable afterward.
 
-Tester: Jordan T. (External User)  
-Feedback: “Pretty intuitive! I wish the time selector was easer to slect AM/PM, though.”
+Tester: Rahem's Sister
+Feedback: "Wanted to update the the length of the location field"
