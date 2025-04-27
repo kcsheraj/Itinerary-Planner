@@ -1,0 +1,13 @@
+Goal: Allow the user to roam across the site without assistance.
+
+Log of what he did:
+1.Signed Up
+2.Created a itinerary
+3.Attempted to add a image but didnt work (because it was too small)
+4.Attempted with another image, and worked.
+5.Created an event, and was struggling on changing the cost.
+6.Struggled to remove the 0 in the cost selection. 
+
+
+Tester: Eldar (Rahem's Friend)
+Feedback: “Worked smoothly. I wish interacting with the "cost” selection was easier to use."
