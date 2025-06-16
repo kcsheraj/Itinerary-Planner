@@ -14,12 +14,26 @@ const app = express();
 app.use(express.json());
 
 // Middleware to allow cross-origin requests
+const allowedOrigins = [
+  "https://wandrr.org",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5174",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., curl, mobile app)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
     credentials: true,
   })
 );
+
 
 // ===== Itinerary SCHEMAS =====
 const ActivitySchema = new mongoose.Schema({

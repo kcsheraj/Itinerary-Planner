@@ -79,7 +79,7 @@ function ShareModal({
   const handleSaveShareSettings = async (data) => {
     try {
       await axios.post(
-        `http://localhost:5001/api/sharesettings/${itineraryId}`,
+        `https://api.wandrr.org/api/sharesettings/${itineraryId}`,
         {
           collaborators: data.collaborators,
           isPublic: data.isPublic,

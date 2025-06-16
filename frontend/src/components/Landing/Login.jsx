@@ -6,6 +6,9 @@ import axios from "axios"; // Add axios import
 import NavbarLogin from "../Navbar/NavbarLogin"; // Import the new Navbar component
 import useUserStore from "../../store/useUserStore"; // Import Zustand store
 
+const API_URL = import.meta.env.VITE_API_URL || "https://api.wandrr.org/api";
+
+
 const Login = () => {
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser); // Get setUser function from Zustand
@@ -33,7 +36,7 @@ const Login = () => {
 
       // Make a POST request to add the user to MongoDB
       const response = await axios.post(
-        "http://localhost:5001/api/add-user",
+        `${API_URL}/add-user`,
         userData
       );
 
