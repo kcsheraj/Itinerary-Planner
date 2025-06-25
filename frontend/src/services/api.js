@@ -4,7 +4,7 @@ import axios from "axios";
 
 import useUserStore from "../store/useUserStore";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://api.wandrr.org/api";
 
 // Setup axios with Firebase token interceaaptor
 const setupAxiosInterceptors = () => {

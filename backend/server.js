@@ -14,9 +14,27 @@ const app = express();
 app.use(express.json());
 
 // Middleware to allow cross-origin requests
+const allowedOrigins = (
+  process.env.ALLOWED_ORIGINS ||
+  "https://wandrr.org,http://localhost:5173,http://localhost:5174"
+).split(",");
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      const allowed = (
+        process.env.FRONTEND_URL
+          ? [process.env.FRONTEND_URL]
+          : allowedOrigins
+      );
+
+      // Allow requests with no origin (e.g., curl, mobile app)
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
     credentials: true,
   })
 );
