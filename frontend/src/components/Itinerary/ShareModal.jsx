@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./ShareModal.css";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL || "https://api.wandrr.org/api";
 
 function ShareModal({
   show,
@@ -78,14 +79,11 @@ function ShareModal({
 
   const handleSaveShareSettings = async (data) => {
     try {
-      await axios.post(
-        `https://api.wandrr.org/api/sharesettings/${itineraryId}`,
-        {
-          collaborators: data.collaborators,
-          isPublic: data.isPublic,
-          description: data.description,
-        }
-      );
+      await axios.post(`${API_URL}/sharesettings/${itineraryId}`, {
+        collaborators: data.collaborators,
+        isPublic: data.isPublic,
+        description: data.description,
+      });
       console.log("Share settings updated!");
     } catch (error) {
       console.error("Failed to update share settings:", error);
