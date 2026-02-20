@@ -1,4 +1,4 @@
-# Itinerary-Planner
+# Itinerary-Planners
 
 Social and Collaborative Itinerary Planner
 
